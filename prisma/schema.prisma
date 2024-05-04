@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email       String       @unique
+  password    String
+  name        String
+  address     String?
+  birthday    DateTime?
+  phoneNumber String?      @unique @map("phone_number")
+  rolesUser   RoleUser[]
+  companyUser CompanyUser?
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  COMPANY
+}
+
+model RoleUser {
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id") @db.Uuid
+  role   Role
+
+  @@unique([userId, role])
+  @@map("role_user")
+}
+
+model Company {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  presentation String?
+  history      String?
+  culture      String?
+  values       String?
+  companyUsers CompanyUser[]
+
+  @@map("companies")
+}
+
+model CompanyUser {
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @map("company_id") @db.Uuid
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String  @unique @map("user_id") @db.Uuid
+
+  @@unique([companyId, userId])
+  @@map("company_user")
+}

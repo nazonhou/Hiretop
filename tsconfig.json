@@ -16,6 +16,29 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@prismaModule/*": [
+        "./src/prisma/*"
+      ],
+      "@user/*": [
+        "src/user/*"
+      ],
+      "@auth/*": [
+        "./src/auth/*"
+      ],
+      "@config/*": [
+        "config/*"
+      ],
+      "@company/*": [
+        "./src/company/*"
+      ],
+      "@validation/*": [
+        "./src/validation/*"
+      ],
+      "@src/*": [
+        "./src/*"
+      ]
+    }
   }
 }
