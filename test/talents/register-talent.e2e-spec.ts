@@ -3,7 +3,7 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { UserModule } from '@user/user.module';
 import { UserRepository } from '@user/user.repository';
-import { User } from '@prisma/client';
+import { User } from '@prismaModule/client';
 import { PrismaService } from '@prismaModule/prisma.service';
 import { ValidationModule } from '@validation/validation.module';
 import { faker } from '@faker-js/faker';
@@ -11,22 +11,31 @@ import { createTestUser } from '@src/test-utils';
 import { CreateTalentDto } from '@user/create-talent.dto';
 import { ConfigModule } from '@nestjs/config';
 import hashConfig from '@config/hash.config';
+import * as bcrypt from 'bcrypt';
 
 describe('[POST] /talents (e2e)', () => {
   let app: INestApplication;
 
   describe("Validate body", () => {
-    const userRepository = {};
-    userRepository["findOneByEmail"] = (email: string): Promise<User | null> => Promise.resolve({
-      ...createTestUser(), email
-    });
+    const findOneByEmailMock = jest.fn(
+      (email: string): Promise<User | null> => Promise.resolve({
+        ...createTestUser(), email
+      })
+    );
+    const userRepository = {
+      findOneByEmail: findOneByEmailMock
+    };
 
     beforeAll(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [UserModule, ValidationModule, ConfigModule.forRoot({
-          load: [hashConfig],
-          isGlobal: true
-        })],
+        imports: [
+          UserModule,
+          ValidationModule,
+          ConfigModule.forRoot({
+            load: [hashConfig],
+            isGlobal: true
+          })
+        ],
       })
         .overrideProvider(UserRepository)
         .useValue(userRepository)
@@ -41,6 +50,10 @@ describe('[POST] /talents (e2e)', () => {
     afterAll(async () => {
       await app.close();
     });
+
+    beforeEach(() => {
+      findOneByEmailMock.mockClear();
+    })
 
     it('should return 422 when any of email password or name is not sent', async () => {
       const result = await request(app.getHttpServer())
@@ -93,9 +106,14 @@ describe('[POST] /talents (e2e)', () => {
   describe("Body is validated", () => {
     const user = createTestUser();
 
-    const userRepository = {};
-    userRepository["findOneByEmail"] = (email: string): Promise<User | null> => Promise.resolve(null);
-    userRepository["create"] = (createTalentDto: CreateTalentDto) => Promise.resolve(user);
+    const findOneByEmailMock = jest.fn(
+      (email: string): Promise<User | null> => Promise.resolve(null)
+    );
+    const createMock = jest.fn((createTalentDto: CreateTalentDto) => Promise.resolve(user));
+    const userRepository = {
+      findOneByEmail: findOneByEmailMock,
+      create: createMock
+    };
 
     beforeAll(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -126,6 +144,9 @@ describe('[POST] /talents (e2e)', () => {
 
       expect(result.status).toEqual(HttpStatus.CREATED);
       expect(user).toMatchObject({ ...result.body, birthday: new Date(result.body["birthday"]) });
+      expect(createMock).toHaveBeenCalledTimes(1);
+      const [createTalentDto] = createMock.mock.calls[0];
+      expect(await bcrypt.compare(user.password, createTalentDto.password)).toBeTruthy();
     });
   });
 });

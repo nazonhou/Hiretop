@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { User } from '@prismaModule/client';
 import { PrismaService } from '@prismaModule/prisma.service';
 import { CreateTalentDto } from './create-talent.dto';
 import { UserRepository } from './user.repository';
@@ -21,7 +21,7 @@ export class UserService {
     });
   }
 
-  async create(createTalentDto: CreateTalentDto) {     
+  async create(createTalentDto: CreateTalentDto) {
     const user = await this.userRepository.create({
       ...createTalentDto,
       password: await bcrypt.hash(createTalentDto.password, this.configService.get<number>("hash.saltRounds"))

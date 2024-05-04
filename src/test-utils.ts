@@ -1,6 +1,6 @@
 import { CreateTalentDto } from "@user/create-talent.dto";
 import { faker } from '@faker-js/faker';
-import { User } from "@prisma/client";
+import { User } from '@prismaModule/client';
 
 export function createTestUserDto(): CreateTalentDto {
   const dto = new CreateTalentDto();

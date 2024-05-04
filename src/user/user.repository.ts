@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@prismaModule/prisma.service";
 import { CreateTalentDto } from "./create-talent.dto";
-import { Role } from "@prisma/client";
+import { Role } from '@prismaModule/client';
 
 @Injectable()
 export class UserRepository {

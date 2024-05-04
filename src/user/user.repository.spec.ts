@@ -5,7 +5,7 @@ import { exec } from "child_process";
 import * as util from "util";
 import { Test } from '@nestjs/testing';
 import { createTestUserDto } from '@src/test-utils';
-import { Role } from '@prisma/client';
+import { Role } from '@prismaModule/client';
 import { faker } from '@faker-js/faker';
 
 describe('UserRepository', () => {
