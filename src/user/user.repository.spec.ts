@@ -1,11 +1,11 @@
-import { PrismaService } from '@prismaModule/prisma.service';
+import { PrismaService } from '@prisma-module/prisma.service';
 import { UserRepository } from './user.repository';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { exec } from "child_process";
 import * as util from "util";
 import { Test } from '@nestjs/testing';
-import { createTestUserDto } from '@src/test-utils';
-import { Role } from '@prismaModule/client';
+import { createCompanyUserDto, createTestUserDto } from '@src/test-utils';
+import { Role } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 
 describe('UserRepository', () => {
@@ -18,7 +18,7 @@ describe('UserRepository', () => {
   beforeAll(async () => {
     container = await new PostgreSqlContainer().start();
 
-    await util.promisify(exec)(`npx prisma migrate dev`, {
+    await util.promisify(exec)(`npx prisma db push`, {
       env: { DATABASE_URL: container.getConnectionUri() }
     });
   });
@@ -43,7 +43,9 @@ describe('UserRepository', () => {
 
     await prismaService.$transaction([
       prismaService.roleUser.deleteMany(),
-      prismaService.user.deleteMany()
+      prismaService.companyUser.deleteMany(),
+      prismaService.user.deleteMany(),
+      prismaService.company.deleteMany()
     ]);
   });
 
@@ -123,6 +125,32 @@ describe('UserRepository', () => {
       await prismaService.user.create({ data: createTestUserDto() });
       const result = await userRepository.findOneByPhoneNumber(faker.phone.number());
       expect(result).toBeNull();
+    });
+  });
+
+  describe("createCompanyUser", () => {
+    it("should insert a user with a Role COMPANY, a company and link them together", async () => {
+      const dto = createCompanyUserDto();
+      const result = await userRepository.createCompanyUser(dto);
+      const user = await prismaService.user.findUnique({
+        where: { email: dto.email },
+        include: {
+          rolesUser: true,
+          companyUser: { include: { company: true } }
+        }
+      });
+
+      const [usersCount, companiesCount, roleUsersCount, companyUsersCount] = await Promise.all([
+        prismaService.user.count(),
+        prismaService.company.count(),
+        prismaService.roleUser.count(),
+        prismaService.companyUser.count()
+      ]);
+
+      expect(result.id).toBe(user.id);
+      expect(user.rolesUser[0].role).toBe(Role.COMPANY);
+      expect(user.companyUser.company.name).toBe(dto.companyName);
+      expect(usersCount === 1 && companiesCount === 1 && roleUsersCount === 1 && companyUsersCount === 1).toBeTruthy();
     });
   });
 

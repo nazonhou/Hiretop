@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/prisma/client"
 }
 
 datasource db {
@@ -44,10 +43,11 @@ model RoleUser {
 
 model Company {
   id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String        @unique
   presentation String?
   history      String?
   culture      String?
-  values       String?
+  values       String[]
   companyUsers CompanyUser[]
 
   @@map("companies")

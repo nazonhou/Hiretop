@@ -7,7 +7,7 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CompanyModule } from './company/company.module';
 import { ValidationModule } from './validation/validation.module';
-import jwtConfig from 'config/jwt.config';
+import jwtConfig from '@config/jwt.config';
 import hashConfig from '@config/hash.config';
 
 @Module({
@@ -20,7 +20,7 @@ import hashConfig from '@config/hash.config';
     UserModule,
     PrismaModule,
     CompanyModule,
-    ValidationModule
+    ValidationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

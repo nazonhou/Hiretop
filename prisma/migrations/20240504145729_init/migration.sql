@@ -23,10 +23,11 @@ CREATE TABLE "role_user" (
 -- CreateTable
 CREATE TABLE "companies" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "name" TEXT NOT NULL,
     "presentation" TEXT,
     "history" TEXT,
     "culture" TEXT,
-    "values" TEXT,
+    "values" TEXT[],
 
     CONSTRAINT "companies_pkey" PRIMARY KEY ("id")
 );
@@ -45,6 +46,9 @@ CREATE UNIQUE INDEX "users_phone_number_key" ON "users"("phone_number");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "role_user_user_id_role_key" ON "role_user"("user_id", "role");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "companies_name_key" ON "companies"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "company_user_user_id_key" ON "company_user"("user_id");

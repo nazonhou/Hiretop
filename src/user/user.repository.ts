@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "@prismaModule/prisma.service";
+import { PrismaService } from "@prisma-module/prisma.service";
 import { CreateTalentDto } from "./create-talent.dto";
-import { Role } from '@prismaModule/client';
+import { Role } from '@prisma/client';
+import { CreateCompanyUserDto } from "./create-company-user-dto";
 
 @Injectable()
 export class UserRepository {
@@ -45,6 +46,32 @@ export class UserRepository {
   findOneByPhoneNumber(phoneNumber: string) {
     return this.prismaService.user.findUnique({
       where: { phoneNumber }
+    });
+  }
+
+  createCompanyUser(createCompanyUserDto: CreateCompanyUserDto) {
+    const { companyName, presentation, values, history, culture, ...userData } = createCompanyUserDto;
+
+    return this.prismaService.user.create({
+      data: {
+        ...userData,
+        companyUser: {
+          create: {
+            company: {
+              create: {
+                name: companyName,
+                presentation,
+                values,
+                history,
+                culture
+              }
+            }
+          }
+        },
+        rolesUser: {
+          create: [{ role: Role.COMPANY }]
+        }
+      },
     });
   }
 }

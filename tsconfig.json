@@ -1,4 +1,9 @@
 {
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ]
+  },
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
@@ -17,19 +22,18 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "allowJs": true,
     "paths": {
-      "@prismaModule/*": [
+      "@prisma-module/*": [
         "./src/prisma/*"
       ],
       "@user/*": [
-        "src/user/*"
+        "./src/user/*"
       ],
       "@auth/*": [
         "./src/auth/*"
       ],
       "@config/*": [
-        "config/*"
+        "./config/*"
       ],
       "@company/*": [
         "./src/company/*"

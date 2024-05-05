@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from 'auth/auth.controller';
-import { AuthService } from 'auth/auth.service';
-import { UsersModule } from 'users/users.module';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { UserModule } from '@user/user.module';
 
 @Module({
   controllers: [AuthController],
@@ -17,7 +17,7 @@ import { AuthGuard } from './auth.guard';
     }
   ],
   imports: [
-    UsersModule,
+    UserModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({

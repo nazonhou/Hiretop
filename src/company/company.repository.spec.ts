@@ -1,11 +1,10 @@
-import { PrismaService } from '@prismaModule/prisma.service';
+import { PrismaService } from '@prisma-module/prisma.service';
 import { CompanyRepository } from './company.repository';
 import { Test } from '@nestjs/testing';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { exec } from "child_process";
 import * as util from "util";
-import { faker } from '@faker-js/faker';
-import { CreateCompanyDto } from './create-company.dto';
+import { createTestCompanyDto, createTestUser } from '@src/test-utils';
 
 describe('CompanyRepository', () => {
   let companyRepository: CompanyRepository;
@@ -41,6 +40,7 @@ describe('CompanyRepository', () => {
     prismaService = moduleRef.get<PrismaService>(PrismaService);
 
     await prismaService.$transaction([
+      prismaService.companyUser.deleteMany(),
       prismaService.company.deleteMany()
     ]);
   });
@@ -54,18 +54,39 @@ describe('CompanyRepository', () => {
     expect(prismaService).toBeDefined();
   });
 
-  it('create should insert company into database', async () => {
-    expect(companyRepository).toBeDefined();
-    expect(prismaService).toBeDefined();
+  describe("create method", () => {
+    it('should insert company into database', async () => {
+      const createCompanyDto = createTestCompanyDto();
 
-    const createCompanyDto = new CreateCompanyDto();
-    createCompanyDto.culture = faker.lorem.paragraph();
-    createCompanyDto.history = faker.lorem.paragraph();
-    createCompanyDto.presentation = faker.lorem.paragraph();
-    createCompanyDto.values = faker.lorem.paragraph();
-
-    const result = await companyRepository.create(createCompanyDto);    
-    expect(await prismaService.company.count()).toBe(1);
-    expect(await prismaService.company.findUnique({ where: { id: result.id } })).not.toBeNull();
+      const result = await companyRepository.create(createCompanyDto);
+      expect(await prismaService.company.count()).toBe(1);
+      expect(await prismaService.company.findUnique({ where: { id: result.id } })).not.toBeNull();
+    });
   });
+
+  describe("createCompanyUser method", () => {
+    it('should insert companyUser into database', async () => {
+      const company = await prismaService.company.create({ data: createTestCompanyDto() });
+      const user = await prismaService.user.create({ data: createTestUser() });
+
+      await companyRepository.createCompanyUser(user.id, company.id);
+      expect(await prismaService.companyUser.count()).toBe(1);
+      expect(await prismaService.companyUser.findUnique({ where: { companyId: company.id, userId: user.id } })).not.toBeNull();
+    });
+  });
+
+  describe("findOneByName method", () => {
+    it('should return a company if name exists', async () => {
+      const company = await prismaService.company.create({ data: createTestCompanyDto() });
+      const result = await companyRepository.findOneByName(company.name);
+      expect(result.id).not.toBeNull();
+      expect(result.id).toBe(company.id);
+    });
+    it('should return null if name does not exists', async () => {
+      const company = await prismaService.company.create({ data: createTestCompanyDto() });
+      const result = await companyRepository.findOneByName("FakeCompanyName");
+      expect(result).toBeNull();
+    });
+  });
+
 });

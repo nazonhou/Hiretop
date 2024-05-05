@@ -1,6 +1,6 @@
 import { OmitType } from "@nestjs/mapped-types";
 import { CreateTalentDto } from "./create-talent.dto";
-import { User } from '@prismaModule/client';
+import { User } from '@prisma/client';
 
 export class UserDto extends OmitType(CreateTalentDto, ['password'] as const) {
   id: string;
