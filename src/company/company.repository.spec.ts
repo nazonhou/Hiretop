@@ -5,6 +5,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers
 import { exec } from "child_process";
 import * as util from "util";
 import { createTestCompanyDto, createTestUser } from '@src/test-utils';
+import TestingPrismaService from '@src/testing.prisma.service';
 
 describe('CompanyRepository', () => {
   let companyRepository: CompanyRepository;
@@ -34,7 +35,10 @@ describe('CompanyRepository', () => {
 
     const moduleRef = await Test.createTestingModule({
       providers: [CompanyRepository, PrismaService],
-    }).compile();
+    })
+      .overrideProvider(PrismaService)
+      .useValue(TestingPrismaService)
+      .compile();
 
     companyRepository = moduleRef.get<CompanyRepository>(CompanyRepository);
     prismaService = moduleRef.get<PrismaService>(PrismaService);
@@ -45,8 +49,9 @@ describe('CompanyRepository', () => {
     ]);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     process.env = originalEnv;
+    await prismaService.$disconnect();
   });
 
   it('should be defined', () => {

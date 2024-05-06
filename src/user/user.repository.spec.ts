@@ -7,6 +7,7 @@ import { Test } from '@nestjs/testing';
 import { createCompanyUserDto, createTestUser, createTestUserDto, createUpdateProfileDto } from '@src/test-utils';
 import { Role } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import TestingPrismaService from '@src/testing.prisma.service';
 
 describe('UserRepository', () => {
   let userRepository: UserRepository;
@@ -36,7 +37,10 @@ describe('UserRepository', () => {
 
     const moduleRef = await Test.createTestingModule({
       providers: [UserRepository, PrismaService],
-    }).compile();
+    })
+      .overrideProvider(PrismaService)
+      .useValue(TestingPrismaService)
+      .compile();
 
     userRepository = moduleRef.get<UserRepository>(UserRepository);
     prismaService = moduleRef.get<PrismaService>(PrismaService);
@@ -49,8 +53,9 @@ describe('UserRepository', () => {
     ]);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     process.env = originalEnv;
+    await prismaService.$disconnect();
   });
 
   it('should be defined', () => {
