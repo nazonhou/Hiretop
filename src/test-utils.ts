@@ -3,6 +3,9 @@ import { faker } from '@faker-js/faker';
 import { Company, User } from '@prisma/client';
 import { CreateCompanyDto } from "@company/create-company.dto";
 import { CreateCompanyUserDto } from "@user/create-company-user-dto";
+import { UpdateProfileDto } from "@user/update-profile-dto";
+import { TokenPayload } from "@auth/auth.service";
+import { Request, Response, NextFunction } from 'express';
 
 export function createTestUserDto(): CreateTalentDto {
   const dto = new CreateTalentDto();
@@ -11,7 +14,7 @@ export function createTestUserDto(): CreateTalentDto {
   dto.email = faker.internet.email();
   dto.name = faker.person.fullName();
   dto.phoneNumber = faker.string.numeric({ length: { min: 8, max: 10 } }),
-  dto.password = faker.internet.password();
+    dto.password = faker.internet.password();
   return dto;
 }
 
@@ -54,5 +57,17 @@ export function createTestCompany(): Company {
     presentation: faker.lorem.paragraph(),
     name: faker.company.name(),
     values: [faker.company.buzzPhrase()]
+  };
+}
+
+export function createUpdateProfileDto(): UpdateProfileDto {
+  const { email, password, ...updateProdileDto } = createTestUserDto();
+  return updateProdileDto;
+}
+
+export function authenticationMiddleware(payload: TokenPayload) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    req['user'] = payload;
+    next();
   };
 }

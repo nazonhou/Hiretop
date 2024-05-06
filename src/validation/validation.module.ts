@@ -33,5 +33,5 @@ export function exceptionFactory(errors: ValidationError[]) {
 };
 
 export function getValidationPipeOptions(): ValidationPipeOptions {
-  return { whitelist: true, transform: true, exceptionFactory };
+  return { whitelist: false, transform: true, exceptionFactory };
 } 

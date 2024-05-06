@@ -11,7 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import hashConfig from '@config/hash.config';
 import * as bcrypt from 'bcrypt';
 import { APP_PIPE } from '@nestjs/core';
-import { exceptionFactory } from "@validation/validation.module";
+import { exceptionFactory, getValidationPipeOptions } from "@validation/validation.module";
 import { ValidationService } from '@validation/validation.service';
 import { UserService } from '@user/user.service';
 import { IsUserEmailAlreadyExistConstraint } from '@validation/user-email-constraint';
@@ -24,7 +24,7 @@ describe('[POST] /talents (e2e)', () => {
   const PROVIDERS = [
     {
       provide: APP_PIPE,
-      useValue: new ValidationPipe({ whitelist: true, transform: true, exceptionFactory }),
+      useValue: new ValidationPipe(getValidationPipeOptions()),
     },
     ValidationService,
     UserService,

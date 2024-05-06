@@ -6,6 +6,8 @@ import { UserDto } from './user.dto';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { CreateCompanyUserDto } from './create-company-user-dto';
+import { TokenPayload } from '@auth/auth.service';
+import { UpdateProfileDto } from './update-profile-dto';
 
 @Injectable()
 export class UserService {
@@ -31,6 +33,11 @@ export class UserService {
       ...createCompanyUserDto,
       password: await bcrypt.hash(createCompanyUserDto.password, this.configService.get<number>("hash.saltRounds"))
     });
+    return UserDto.fromUser(user);
+  }
+
+  async updateUserProfile(payload: TokenPayload, data: UpdateProfileDto) {
+    const user = await this.userRepository.updateUser(payload.sub, data);
     return UserDto.fromUser(user);
   }
 }

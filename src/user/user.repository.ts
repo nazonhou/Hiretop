@@ -3,6 +3,7 @@ import { PrismaService } from "@prisma-module/prisma.service";
 import { CreateTalentDto } from "./create-talent.dto";
 import { Role } from '@prisma/client';
 import { CreateCompanyUserDto } from "./create-company-user-dto";
+import { UpdateProfileDto } from "./update-profile-dto";
 
 @Injectable()
 export class UserRepository {
@@ -72,6 +73,13 @@ export class UserRepository {
           create: [{ role: Role.COMPANY }]
         }
       },
+    });
+  }
+
+  updateUser(id: string, data: UpdateProfileDto) {
+    return this.prismaService.user.update({
+      where: { id },
+      data
     });
   }
 }

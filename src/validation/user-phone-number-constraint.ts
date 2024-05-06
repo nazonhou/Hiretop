@@ -14,7 +14,20 @@ export class IsUserPhoneNumberAlreadyExistConstraint implements ValidatorConstra
   constructor(private userRepository: UserRepository) {}
 
   async validate(value: string, args: ValidationArguments) {
-    return (await this.userRepository.findOneByPhoneNumber(value)) === null;
+    const [update] = args.constraints as [boolean | undefined];
+
+    if (update === undefined || update === false) {
+      return (await this.userRepository.findOneByPhoneNumber(value)) === null;
+    }
+
+    const injectedUser = (args.object as any)?.injected?.user;
+    const user = await this.userRepository.findOneByPhoneNumber(value);
+
+    if (!user || user.id == injectedUser?.sub) {
+      return true;
+    }
+
+    return false;
   }
 
   defaultMessage(validationArguments?: ValidationArguments): string {
@@ -22,13 +35,13 @@ export class IsUserPhoneNumberAlreadyExistConstraint implements ValidatorConstra
   }
 }
 
-export function IsUserPhoneNumberAlreadyExist(validationOptions?: ValidationOptions) {
+export function IsUserPhoneNumberAlreadyExist(update?: boolean, validationOptions?: ValidationOptions) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
-      constraints: [],
+      constraints: [update],
       validator: IsUserPhoneNumberAlreadyExistConstraint,
     });
   };

@@ -41,6 +41,9 @@
       "@validation/*": [
         "./src/validation/*"
       ],
+      "@request-interceptor/*": [
+        "./src/request-interceptor/*"
+      ],
       "@src/*": [
         "./src/*"
       ]

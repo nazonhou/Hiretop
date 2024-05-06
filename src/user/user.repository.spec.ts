@@ -4,7 +4,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { exec } from "child_process";
 import * as util from "util";
 import { Test } from '@nestjs/testing';
-import { createCompanyUserDto, createTestUserDto } from '@src/test-utils';
+import { createCompanyUserDto, createTestUser, createTestUserDto, createUpdateProfileDto } from '@src/test-utils';
 import { Role } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 
@@ -154,4 +154,14 @@ describe('UserRepository', () => {
     });
   });
 
+  describe("updateUser", () => {
+    it("should update a user", async () => {
+      const data = createUpdateProfileDto();
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const result = await userRepository.updateUser(user.id, data);
+
+      expect(result.id).toBe(user.id);
+      expect(result).toMatchObject(data);
+    });
+  });
 });

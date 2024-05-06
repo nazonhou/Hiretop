@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CompanyModule } from './company/company.module';
 import { ValidationModule } from './validation/validation.module';
+import { RequestInterceptorModule } from './request-interceptor/request-interceptor.module';
 import jwtConfig from '@config/jwt.config';
 import hashConfig from '@config/hash.config';
 
@@ -21,6 +22,7 @@ import hashConfig from '@config/hash.config';
     PrismaModule,
     CompanyModule,
     ValidationModule,
+    RequestInterceptorModule,
   ],
   controllers: [AppController],
   providers: [AppService],
