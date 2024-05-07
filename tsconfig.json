@@ -44,6 +44,9 @@
       "@request-interceptor/*": [
         "./src/request-interceptor/*"
       ],
+      "@skill/*": [
+        "./src/skill/*"
+      ],
       "@src/*": [
         "./src/*"
       ]

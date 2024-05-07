@@ -7,6 +7,7 @@ import { UserModule } from '@user/user.module';
 import { IsUserPhoneNumberAlreadyExistConstraint } from './user-phone-number-constraint';
 import { IsCompanyNameAlreadyExistConstraint } from './company-name-constraint';
 import { CompanyModule } from '@company/company.module';
+import { IsSkillNameAlreadyExistConstraint } from './skill-name-constraint';
 
 
 @Module({
@@ -18,7 +19,8 @@ import { CompanyModule } from '@company/company.module';
     ValidationService,
     IsUserEmailAlreadyExistConstraint,
     IsUserPhoneNumberAlreadyExistConstraint,
-    IsCompanyNameAlreadyExistConstraint
+    IsCompanyNameAlreadyExistConstraint,
+    IsSkillNameAlreadyExistConstraint
   ],
   imports: [UserModule, CompanyModule]
 })

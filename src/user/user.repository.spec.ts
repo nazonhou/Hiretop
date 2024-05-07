@@ -4,7 +4,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { exec } from "child_process";
 import * as util from "util";
 import { Test } from '@nestjs/testing';
-import { createCompanyUserDto, createTestUser, createTestUserDto, createUpdateProfileDto } from '@src/test-utils';
+import { createCompanyUserDto, createTestUserDto, createUpdateProfileDto } from '@src/test-utils';
 import { Role } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import TestingPrismaService from '@src/testing.prisma.service';
@@ -48,6 +48,7 @@ describe('UserRepository', () => {
     await prismaService.$transaction([
       prismaService.roleUser.deleteMany(),
       prismaService.companyUser.deleteMany(),
+      prismaService.skill.deleteMany(),
       prismaService.user.deleteMany(),
       prismaService.company.deleteMany()
     ]);

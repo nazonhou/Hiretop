@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { CompanyModule } from './company/company.module';
 import { ValidationModule } from './validation/validation.module';
 import { RequestInterceptorModule } from './request-interceptor/request-interceptor.module';
+import { SkillModule } from './skill/skill.module';
 import jwtConfig from '@config/jwt.config';
 import hashConfig from '@config/hash.config';
 
@@ -23,6 +24,7 @@ import hashConfig from '@config/hash.config';
     CompanyModule,
     ValidationModule,
     RequestInterceptorModule,
+    SkillModule,
   ],
   controllers: [AppController],
   providers: [AppService],

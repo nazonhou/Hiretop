@@ -23,7 +23,7 @@ module.exports = {
     "ts"
   ],
   "rootDir": ".",
-  "testRegex": ".*\\.spec\\.ts$",
+  "testRegex": "(.*\\.spec\\.ts$)|(.*\\.e2e-spec\\.ts$)",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },

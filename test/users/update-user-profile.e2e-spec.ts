@@ -1,13 +1,13 @@
 import { TokenPayload } from "@auth/auth.service";
 import hashConfig from "@config/hash.config";
 import { faker } from "@faker-js/faker";
-import { CanActivate, ExecutionContext, HttpStatus, INestApplication, UnauthorizedException, ValidationPipe } from "@nestjs/common";
+import { ExecutionContext, HttpStatus, INestApplication, UnauthorizedException, ValidationPipe } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD, APP_PIPE } from "@nestjs/core";
 import { Test, TestingModule } from "@nestjs/testing";
 import { PrismaService } from "@prisma-module/prisma.service";
 import { RequestInterceptorModule } from "@request-interceptor/request-interceptor.module";
-import { authenticationMiddleware, createTestUser, createUpdateProfileDto } from "@src/test-utils";
+import { authenticationMiddleware, createAuthenticated, createTestUser, createUpdateProfileDto } from "@src/test-utils";
 import { UpdateProfileDto } from "@user/update-profile-dto";
 import { UserController } from "@user/user.controller";
 import { UserRepository } from "@user/user.repository";
@@ -19,7 +19,7 @@ import * as request from 'supertest';
 
 describe('[PUT] /users/profile (e2e)', () => {
   let app: INestApplication;
-  const AUTHENTICATED: TokenPayload = { email: faker.internet.email(), sub: faker.string.uuid() };
+  const AUTHENTICATED: TokenPayload = createAuthenticated();
   const PROVIDERS = [
     {
       provide: APP_PIPE,

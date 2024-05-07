@@ -9,6 +9,7 @@ import { APP_PIPE } from "@nestjs/core";
 import { JwtModule, JwtService } from "@nestjs/jwt";
 import { Test, TestingModule } from "@nestjs/testing";
 import { PrismaService } from "@prisma-module/prisma.service";
+import { SkillRepository } from "@skill/skill.repository";
 import { createTestUser } from "@src/test-utils";
 import { UserRepository } from "@user/user.repository";
 import { UserService } from "@user/user.service";
@@ -30,7 +31,8 @@ describe('[POST] /auth/login (e2e)', () => {
       provide: APP_PIPE,
       useValue: new ValidationPipe(getValidationPipeOptions()),
     },
-    ValidationService
+    ValidationService,
+    SkillRepository
   ];
   const IMPORTS = [
     ConfigModule.forRoot({
@@ -58,6 +60,8 @@ describe('[POST] /auth/login (e2e)', () => {
         .overrideProvider(UserRepository)
         .useValue({})
         .overrideProvider(PrismaService)
+        .useValue({})
+        .overrideProvider(SkillRepository)
         .useValue({})
         .compile();
 
@@ -106,6 +110,8 @@ describe('[POST] /auth/login (e2e)', () => {
         .useValue(userRepositoryMock)
         .overrideProvider(PrismaService)
         .useValue({})
+        .overrideProvider(SkillRepository)
+        .useValue({})
         .compile();
 
       app = moduleFixture.createNestApplication();
@@ -151,6 +157,8 @@ describe('[POST] /auth/login (e2e)', () => {
         .overrideProvider(UserRepository)
         .useValue(userRepositoryMock)
         .overrideProvider(PrismaService)
+        .useValue({})
+        .overrideProvider(SkillRepository)
         .useValue({})
         .compile();
 

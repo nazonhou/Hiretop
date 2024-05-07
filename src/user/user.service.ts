@@ -8,12 +8,15 @@ import * as bcrypt from 'bcrypt';
 import { CreateCompanyUserDto } from './create-company-user-dto';
 import { TokenPayload } from '@auth/auth.service';
 import { UpdateProfileDto } from './update-profile-dto';
+import { SkillRepository } from '@skill/skill.repository';
+import { CreateSkillDto } from '@skill/create-skill.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     private userRepository: UserRepository,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private skillRepository: SkillRepository
   ) {}
 
   findByEmail(email: string): Promise<User | null> {
@@ -39,5 +42,9 @@ export class UserService {
   async updateUserProfile(payload: TokenPayload, data: UpdateProfileDto) {
     const user = await this.userRepository.updateUser(payload.sub, data);
     return UserDto.fromUser(user);
+  }
+
+  createSkill(user: TokenPayload, createSkillDto: CreateSkillDto) {
+    return this.skillRepository.createSkill(user.sub, createSkillDto);
   }
 }

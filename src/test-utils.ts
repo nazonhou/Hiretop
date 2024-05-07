@@ -6,6 +6,7 @@ import { CreateCompanyUserDto } from "@user/create-company-user-dto";
 import { UpdateProfileDto } from "@user/update-profile-dto";
 import { TokenPayload } from "@auth/auth.service";
 import { Request, Response, NextFunction } from 'express';
+import { CreateSkillDto } from "@skill/create-skill.dto";
 
 export function createTestUserDto(): CreateTalentDto {
   const dto = new CreateTalentDto();
@@ -70,4 +71,18 @@ export function authenticationMiddleware(payload: TokenPayload) {
     req['user'] = payload;
     next();
   };
+}
+
+export function createTestSkillDto(): CreateSkillDto {
+  const createSkillDto = new CreateSkillDto();
+  createSkillDto.name = faker.person.jobType();
+  return createSkillDto;
+}
+
+export function createTestSkill() {
+  return { ...createTestSkillDto(), id: faker.string.uuid(), authorId: faker.string.uuid() };
+}
+
+export function createAuthenticated(): TokenPayload {
+  return { email: faker.internet.email(), sub: faker.string.uuid() };
 }

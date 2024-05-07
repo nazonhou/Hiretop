@@ -14,15 +14,17 @@ datasource db {
 }
 
 model User {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email       String       @unique
-  password    String
-  name        String
-  address     String?
-  birthday    DateTime?
-  phoneNumber String?      @unique @map("phone_number")
-  rolesUser   RoleUser[]
-  companyUser CompanyUser?
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String       @unique
+  password      String
+  name          String
+  address       String?
+  birthday      DateTime?
+  phoneNumber   String?      @unique @map("phone_number")
+  rolesUser     RoleUser[]
+  companyUser   CompanyUser?
+  skills        Skill[]      @relation("UserSkills")
+  skillsCreated Skill[]      @relation("SkillAuthor")
 
   @@map("users")
 }
@@ -61,4 +63,14 @@ model CompanyUser {
 
   @@unique([companyId, userId])
   @@map("company_user")
+}
+
+model Skill {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String @unique
+  users    User[] @relation("UserSkills")
+  author   User   @relation("SkillAuthor", fields: [authorId], references: [id])
+  authorId String @map("author_id") @db.Uuid
+
+  @@map("skills")
 }
