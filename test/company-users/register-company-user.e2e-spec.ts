@@ -19,6 +19,7 @@ import { exceptionFactory, getValidationPipeOptions } from "@validation/validati
 import { ValidationService } from '@validation/validation.service';
 import * as bcrypt from 'bcrypt';
 import { CreateCompanyUserDto } from '@user/create-company-user-dto';
+import { SkillRepository } from '@skill/skill.repository';
 
 describe('[POST] /company-users (e2e)', () => {
   let app: INestApplication;
@@ -34,7 +35,8 @@ describe('[POST] /company-users (e2e)', () => {
     PrismaService,
     IsUserEmailAlreadyExistConstraint,
     IsUserPhoneNumberAlreadyExistConstraint,
-    IsCompanyNameAlreadyExistConstraint
+    IsCompanyNameAlreadyExistConstraint,
+    SkillRepository
   ];
 
   const IMPORTS = [
@@ -83,6 +85,8 @@ describe('[POST] /company-users (e2e)', () => {
         .overrideProvider(CompanyRepository)
         .useValue(companyRepository)
         .overrideProvider(PrismaService)
+        .useValue({})
+        .overrideProvider(SkillRepository)
         .useValue({})
         .compile();
 
@@ -211,6 +215,8 @@ describe('[POST] /company-users (e2e)', () => {
         .overrideProvider(CompanyRepository)
         .useValue(companyRepository)
         .overrideProvider(PrismaService)
+        .useValue({})
+        .overrideProvider(SkillRepository)
         .useValue({})
         .compile();
 

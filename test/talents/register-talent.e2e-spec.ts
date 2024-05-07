@@ -11,12 +11,13 @@ import { ConfigModule } from '@nestjs/config';
 import hashConfig from '@config/hash.config';
 import * as bcrypt from 'bcrypt';
 import { APP_PIPE } from '@nestjs/core';
-import { exceptionFactory, getValidationPipeOptions } from "@validation/validation.module";
+import { getValidationPipeOptions } from "@validation/validation.module";
 import { ValidationService } from '@validation/validation.service';
 import { UserService } from '@user/user.service';
 import { IsUserEmailAlreadyExistConstraint } from '@validation/user-email-constraint';
 import { IsUserPhoneNumberAlreadyExistConstraint } from '@validation/user-phone-number-constraint';
 import { TalentController } from '@user/talent.controller';
+import { SkillRepository } from '@skill/skill.repository';
 
 describe('[POST] /talents (e2e)', () => {
   let app: INestApplication;
@@ -32,6 +33,7 @@ describe('[POST] /talents (e2e)', () => {
     PrismaService,
     IsUserEmailAlreadyExistConstraint,
     IsUserPhoneNumberAlreadyExistConstraint,
+    SkillRepository
   ];
 
   const IMPORTS = [
@@ -68,6 +70,8 @@ describe('[POST] /talents (e2e)', () => {
         .overrideProvider(UserRepository)
         .useValue(userRepository)
         .overrideProvider(PrismaService)
+        .useValue({})
+        .overrideProvider(SkillRepository)
         .useValue({})
         .compile();
 
@@ -166,6 +170,8 @@ describe('[POST] /talents (e2e)', () => {
         .overrideProvider(UserRepository)
         .useValue(userRepository)
         .overrideProvider(PrismaService)
+        .useValue({})
+        .overrideProvider(SkillRepository)
         .useValue({})
         .compile();
 

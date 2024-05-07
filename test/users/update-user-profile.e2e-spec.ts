@@ -1,12 +1,12 @@
 import { TokenPayload } from "@auth/auth.service";
 import hashConfig from "@config/hash.config";
-import { faker } from "@faker-js/faker";
 import { ExecutionContext, HttpStatus, INestApplication, UnauthorizedException, ValidationPipe } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD, APP_PIPE } from "@nestjs/core";
 import { Test, TestingModule } from "@nestjs/testing";
 import { PrismaService } from "@prisma-module/prisma.service";
 import { RequestInterceptorModule } from "@request-interceptor/request-interceptor.module";
+import { SkillRepository } from "@skill/skill.repository";
 import { authenticationMiddleware, createAuthenticated, createTestUser, createUpdateProfileDto } from "@src/test-utils";
 import { UpdateProfileDto } from "@user/update-profile-dto";
 import { UserController } from "@user/user.controller";
@@ -30,6 +30,7 @@ describe('[PUT] /users/profile (e2e)', () => {
     UserRepository,
     PrismaService,
     IsUserPhoneNumberAlreadyExistConstraint,
+    SkillRepository
   ];
 
   const IMPORTS = [
@@ -63,6 +64,8 @@ describe('[PUT] /users/profile (e2e)', () => {
         .overrideProvider(UserRepository)
         .useValue({})
         .overrideProvider(PrismaService)
+        .useValue({})
+        .overrideProvider(SkillRepository)
         .useValue({})
         .compile();
 
@@ -109,6 +112,8 @@ describe('[PUT] /users/profile (e2e)', () => {
         .overrideProvider(UserRepository)
         .useValue(userRepository)
         .overrideProvider(PrismaService)
+        .useValue({})
+        .overrideProvider(SkillRepository)
         .useValue({})
         .compile();
 
@@ -158,6 +163,8 @@ describe('[PUT] /users/profile (e2e)', () => {
         .overrideProvider(UserRepository)
         .useValue(userRepository)
         .overrideProvider(PrismaService)
+        .useValue({})
+        .overrideProvider(SkillRepository)
         .useValue({})
         .compile();
 
@@ -215,6 +222,8 @@ describe('[PUT] /users/profile (e2e)', () => {
         .useValue(userRepository)
         .overrideProvider(PrismaService)
         .useValue({})
+        .overrideProvider(SkillRepository)
+        .useValue({})
         .compile();
 
       app = moduleFixture.createNestApplication();
@@ -271,6 +280,8 @@ describe('[PUT] /users/profile (e2e)', () => {
         .overrideProvider(UserRepository)
         .useValue(userRepository)
         .overrideProvider(PrismaService)
+        .useValue({})
+        .overrideProvider(SkillRepository)
         .useValue({})
         .compile();
 
