@@ -7,6 +7,7 @@ import { Test } from '@nestjs/testing';
 import TestingPrismaService from '@src/testing.prisma.service';
 import { createTestSkillDto, createTestUserDto } from '@src/test-utils';
 import { faker } from '@faker-js/faker';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 describe('SkillRepository', () => {
   let skillRepository: SkillRepository;
@@ -112,6 +113,73 @@ describe('SkillRepository', () => {
       });
       const result = await skillRepository.findOneByName("FAKE_NAME");
       expect(result).toBeNull();
+    });
+  });
+
+  describe('findByIds', () => {
+    it('Should retrieve all skills when all ids refer to real skills', async () => {
+      const { id: authorId } = await prismaService.user.create({ data: createTestUserDto() });
+      const skills = await Promise.all([
+        prismaService.skill.create({
+          data: {
+            name: faker.person.jobTitle(), author: { connect: { id: authorId } }
+          }
+        }),
+        prismaService.skill.create({
+          data: {
+            name: faker.person.jobTitle(), author: { connect: { id: authorId } }
+          }
+        })
+      ]);
+      const result = await skillRepository.findByIds(skills.map(({ id }) => id));
+      expect(result.length).toBe(2);
+    });
+    it('Should not retrieve a skill when the id does not exist', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const skill = await prismaService.skill.create({
+        data: {
+          name: faker.person.jobTitle(), author: { connect: { id: user.id } }
+        }
+      });
+      const result = await skillRepository.findByIds([faker.string.uuid()]);
+      expect(result.length).toBe(0);
+    });
+    it('Should throw an exception when id is not a valid UUID', async () => {
+      expect(skillRepository.findByIds([faker.string.alphanumeric()])).rejects.toThrow(PrismaClientKnownRequestError);
+    });
+  });
+
+  describe('findUserSkills', () => {
+    it('Should retrieve a skill when its associated with the user', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const anotherUser = await prismaService.user.create({ data: createTestUserDto() });
+      const skills = await Promise.all([
+        prismaService.skill.create({
+          data: {
+            name: faker.person.jobTitle(), author: { connect: { id: user.id } }, users: { connect: [{ id: user.id }] }
+          }
+        }),
+        prismaService.skill.create({
+          data: {
+            name: faker.person.jobTitle(), author: { connect: { id: user.id } }, users: { connect: [{ id: anotherUser.id }] }
+          }
+        })
+      ]);
+      const result = await skillRepository.findUserSkills(user.id);
+      expect(result.length).toBe(1);
+    });
+    it('Should not retrieve a skill when its not associated with the user', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const anotherUser = await prismaService.user.create({ data: createTestUserDto() });
+      const skills = await Promise.all([
+        prismaService.skill.create({
+          data: {
+            name: faker.person.jobTitle(), author: { connect: { id: user.id } }, users: { connect: [{ id: anotherUser.id }] }
+          }
+        })
+      ]);
+      const result = await skillRepository.findUserSkills(user.id);
+      expect(result.length).toBe(0);
     });
   });
 });

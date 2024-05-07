@@ -2,11 +2,12 @@ import { CreateTalentDto } from "@user/create-talent.dto";
 import { faker } from '@faker-js/faker';
 import { Company, User } from '@prisma/client';
 import { CreateCompanyDto } from "@company/create-company.dto";
-import { CreateCompanyUserDto } from "@user/create-company-user-dto";
+import { CreateCompanyUserDto } from "@user/create-company-user.dto";
 import { UpdateProfileDto } from "@user/update-profile-dto";
 import { TokenPayload } from "@auth/auth.service";
 import { Request, Response, NextFunction } from 'express';
 import { CreateSkillDto } from "@skill/create-skill.dto";
+import { UpdateSkillsDto } from "@user/update-skills.dto";
 
 export function createTestUserDto(): CreateTalentDto {
   const dto = new CreateTalentDto();
@@ -85,4 +86,8 @@ export function createTestSkill() {
 
 export function createAuthenticated(): TokenPayload {
   return { email: faker.internet.email(), sub: faker.string.uuid() };
+}
+
+export function createTestUpdateSkillsDto(): UpdateSkillsDto {
+  return { skillIds: [faker.string.uuid()] };
 }

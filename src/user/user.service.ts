@@ -5,11 +5,12 @@ import { UserRepository } from './user.repository';
 import { UserDto } from './user.dto';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { CreateCompanyUserDto } from './create-company-user-dto';
+import { CreateCompanyUserDto } from './create-company-user.dto';
 import { TokenPayload } from '@auth/auth.service';
 import { UpdateProfileDto } from './update-profile-dto';
 import { SkillRepository } from '@skill/skill.repository';
 import { CreateSkillDto } from '@skill/create-skill.dto';
+import { UpdateSkillsDto } from './update-skills.dto';
 
 @Injectable()
 export class UserService {
@@ -46,5 +47,13 @@ export class UserService {
 
   createSkill(user: TokenPayload, createSkillDto: CreateSkillDto) {
     return this.skillRepository.createSkill(user.sub, createSkillDto);
+  }
+
+  updateSkills(user: TokenPayload, updateSkillsDto: UpdateSkillsDto) {
+    return this.userRepository.updateSkills(user.sub, updateSkillsDto.skillIds);
+  }
+
+  findUserSkills(userId: string) {
+    return this.skillRepository.findUserSkills(userId);
   }
 }

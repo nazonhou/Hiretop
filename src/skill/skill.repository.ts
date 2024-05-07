@@ -30,4 +30,16 @@ export class SkillRepository {
   findOneByName(name: string) {
     return this.prismaService.skill.findUnique({ where: { name } });
   }
+
+  findByIds(ids: string[]) {
+    return this.prismaService.skill.findMany({
+      where: { id: { in: ids } }
+    });
+  }
+
+  findUserSkills(userId: string) {
+    return this.prismaService.skill.findMany({
+      where: { users: { some: { id: userId } } }
+    })
+  }
 }

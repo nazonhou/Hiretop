@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@prisma-module/prisma.service";
 import { CreateTalentDto } from "./create-talent.dto";
 import { Role } from '@prisma/client';
-import { CreateCompanyUserDto } from "./create-company-user-dto";
+import { CreateCompanyUserDto } from "./create-company-user.dto";
 import { UpdateProfileDto } from "./update-profile-dto";
 
 @Injectable()
@@ -14,11 +14,11 @@ export class UserRepository {
   }
 
   async grantRoles(userId: string, roles: Role[]) {
-    const actualRoles = (await this.prismaService.roleUser.findMany({ where: { userId } }))
+    const currentRoles = (await this.prismaService.roleUser.findMany({ where: { userId } }))
       .map((userRole => userRole.role));
 
-    const rolesToConnect = roles.filter(role => !actualRoles.includes(role));
-    const rolesToDisconnect = actualRoles.filter(actualRole => !roles.includes(actualRole));
+    const rolesToConnect = roles.filter(role => !currentRoles.includes(role));
+    const rolesToDisconnect = currentRoles.filter(actualRole => !roles.includes(actualRole));
 
     await Promise.all([
       this.prismaService.roleUser.deleteMany({
@@ -81,5 +81,26 @@ export class UserRepository {
       where: { id },
       data
     });
+  }
+
+  async updateSkills(userId: string, skillIds: string[]) {
+    const currentSkillIds = (await this.prismaService.skill.findMany({ where: { users: { some: { id: userId } } } }))
+      .map(skill => skill.id);
+
+    const skillIdsToDeconnect = currentSkillIds.filter(currentSkillId => !skillIds.includes(currentSkillId));
+    const skillIdsToConnect = skillIds.filter(skillId => !currentSkillIds.includes(skillId));
+
+    const userWithUpdatedSkills = await this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        skills: {
+          connect: skillIdsToConnect.map(id => ({ id })),
+          disconnect: skillIdsToDeconnect.map(id => ({ id })),
+        }
+      },
+      include: { skills: true }
+    });
+
+    return userWithUpdatedSkills.skills
   }
 }

@@ -4,7 +4,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { exec } from "child_process";
 import * as util from "util";
 import { Test } from '@nestjs/testing';
-import { createCompanyUserDto, createTestUserDto, createUpdateProfileDto } from '@src/test-utils';
+import { createCompanyUserDto, createTestSkillDto, createTestUserDto, createUpdateProfileDto } from '@src/test-utils';
 import { Role } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import TestingPrismaService from '@src/testing.prisma.service';
@@ -168,6 +168,26 @@ describe('UserRepository', () => {
 
       expect(result.id).toBe(user.id);
       expect(result).toMatchObject(data);
+    });
+  });
+
+  describe('updateSkills', () => {
+    it("Should add a skill when current skills does not include it", async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const skill = await prismaService.skill.create({ data: { ...createTestSkillDto(), authorId: user.id } });
+      const result = await userRepository.updateSkills(user.id, [skill.id]);
+
+      expect((await prismaService.skill.findMany({ where: { users: { some: { id: user.id } } } })).length).toBe(1);
+      expect(result[0]).toMatchObject(skill);
+    });
+    it("Should remove a skill when present in current skills but not in skills to update", async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const skill = await prismaService.skill.create({
+        data: { ...createTestSkillDto(), authorId: user.id, users: { connect: [{ id: user.id }] } },
+      });
+      const result = await userRepository.updateSkills(user.id, []);
+
+      expect((await prismaService.skill.findMany({ where: { users: { some: { id: user.id } } } })).length).toBe(0);
     });
   });
 });
