@@ -51,7 +51,7 @@ export class UserRepository {
   }
 
   createCompanyUser(createCompanyUserDto: CreateCompanyUserDto) {
-    const { companyName, presentation, values, history, culture, ...userData } = createCompanyUserDto;
+    const { companyName, presentation, values, history, culture, category, ...userData } = createCompanyUserDto;
 
     return this.prismaService.user.create({
       data: {
@@ -64,7 +64,8 @@ export class UserRepository {
                 presentation,
                 values,
                 history,
-                culture
+                culture,
+                category
               }
             }
           }

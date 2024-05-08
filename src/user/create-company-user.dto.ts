@@ -1,8 +1,9 @@
+import { CompanyCategory } from "@prisma/client";
 import { IsCompanyNameAlreadyExist } from "@validation/company-name-constraint";
 import { IsUserEmailAlreadyExist } from "@validation/user-email-constraint";
 import { IsUserPhoneNumberAlreadyExist } from "@validation/user-phone-number-constraint";
 import { Type } from "class-transformer";
-import { ArrayUnique, IsEmail, IsNotEmpty, IsNumberString, IsOptional, MaxDate } from "class-validator";
+import { ArrayUnique, IsEmail, IsEnum, IsNotEmpty, IsNumberString, IsOptional, MaxDate } from "class-validator";
 
 export class CreateCompanyUserDto {
   @IsUserEmailAlreadyExist()
@@ -44,4 +45,8 @@ export class CreateCompanyUserDto {
 
   @ArrayUnique()
   values: string[]
+
+  @IsEnum(CompanyCategory)
+  @IsOptional()
+  category?: CompanyCategory
 }

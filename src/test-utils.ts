@@ -1,6 +1,6 @@
 import { CreateTalentDto } from "@user/create-talent.dto";
 import { faker } from '@faker-js/faker';
-import { Company, User } from '@prisma/client';
+import { Company, CompanyCategory, JobType, LocationType, User, WorkExperience } from '@prisma/client';
 import { CreateCompanyDto } from "@company/create-company.dto";
 import { CreateCompanyUserDto } from "@user/create-company-user.dto";
 import { UpdateProfileDto } from "@user/update-profile-dto";
@@ -8,6 +8,7 @@ import { TokenPayload } from "@auth/auth.service";
 import { Request, Response, NextFunction } from 'express';
 import { CreateSkillDto } from "@skill/create-skill.dto";
 import { UpdateSkillsDto } from "@user/update-skills.dto";
+import { CreateWorkExperienceDto } from "@work-experience/create-work-experience.dto";
 
 export function createTestUserDto(): CreateTalentDto {
   const dto = new CreateTalentDto();
@@ -39,6 +40,7 @@ export function createTestCompanyDto() {
   createCompanyDto.presentation = faker.lorem.paragraph();
   createCompanyDto.values = [faker.lorem.paragraph()];
   createCompanyDto.name = faker.company.name();
+  createCompanyDto.category = faker.helpers.enumValue(CompanyCategory);
   return createCompanyDto;
 }
 
@@ -58,7 +60,8 @@ export function createTestCompany(): Company {
     history: faker.lorem.paragraph(),
     presentation: faker.lorem.paragraph(),
     name: faker.company.name(),
-    values: [faker.company.buzzPhrase()]
+    values: [faker.company.buzzPhrase()],
+    category: faker.helpers.enumValue(CompanyCategory)
   };
 }
 
@@ -90,4 +93,32 @@ export function createAuthenticated(): TokenPayload {
 
 export function createTestUpdateSkillsDto(): UpdateSkillsDto {
   return { skillIds: [faker.string.uuid()] };
+}
+
+export function createTestWorkExperienceDto(companyId: string): CreateWorkExperienceDto {
+  const createWorkExperienceDto = new CreateWorkExperienceDto();
+  createWorkExperienceDto.description = faker.lorem.paragraph();
+  createWorkExperienceDto.location = faker.location.city();
+  createWorkExperienceDto.locationType = faker.helpers.enumValue(LocationType);
+  createWorkExperienceDto.title = faker.person.jobTitle();
+  createWorkExperienceDto.type = faker.helpers.enumValue(JobType);
+  createWorkExperienceDto.startedAt = faker.date.past();
+  createWorkExperienceDto.endedAt = faker.date.future({ refDate: createWorkExperienceDto.startedAt });
+  createWorkExperienceDto.companyId = companyId;
+  return createWorkExperienceDto;
+}
+
+export function createTestWorkExperience(): WorkExperience {
+  return {
+    id: faker.string.uuid(),
+    userId: faker.string.uuid(),
+    companyId: faker.string.uuid(),
+    description: faker.lorem.paragraph(),
+    location: faker.location.city(),
+    locationType: faker.helpers.enumValue(LocationType),
+    title: faker.person.jobTitle(),
+    type: faker.helpers.enumValue(JobType),
+    startedAt: faker.date.recent(),
+    endedAt: faker.date.soon(),
+  };
 }

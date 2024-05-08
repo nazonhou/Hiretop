@@ -156,6 +156,7 @@ describe('UserRepository', () => {
       expect(result.id).toBe(user.id);
       expect(user.rolesUser[0].role).toBe(Role.COMPANY);
       expect(user.companyUser.company.name).toBe(dto.companyName);
+      expect(user.companyUser.company.category).toBe(dto.category);
       expect(usersCount === 1 && companiesCount === 1 && roleUsersCount === 1 && companyUsersCount === 1).toBeTruthy();
     });
   });

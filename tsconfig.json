@@ -47,6 +47,9 @@
       "@skill/*": [
         "./src/skill/*"
       ],
+      "@work-experience/*": [
+        "./src/work-experience/*"
+      ],
       "@src/*": [
         "./src/*"
       ]

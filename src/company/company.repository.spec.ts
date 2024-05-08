@@ -6,6 +6,8 @@ import { exec } from "child_process";
 import * as util from "util";
 import { createTestCompanyDto, createTestUser } from '@src/test-utils';
 import TestingPrismaService from '@src/testing.prisma.service';
+import { faker } from '@faker-js/faker';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 describe('CompanyRepository', () => {
   let companyRepository: CompanyRepository;
@@ -45,18 +47,14 @@ describe('CompanyRepository', () => {
 
     await prismaService.$transaction([
       prismaService.companyUser.deleteMany(),
-      prismaService.company.deleteMany()
+      prismaService.company.deleteMany(),
+      prismaService.user.deleteMany(),
     ]);
   });
 
   afterEach(async () => {
     process.env = originalEnv;
     await prismaService.$disconnect();
-  });
-
-  it('should be defined', () => {
-    expect(companyRepository).toBeDefined();
-    expect(prismaService).toBeDefined();
   });
 
   describe("create method", () => {
@@ -91,6 +89,23 @@ describe('CompanyRepository', () => {
       const company = await prismaService.company.create({ data: createTestCompanyDto() });
       const result = await companyRepository.findOneByName("FakeCompanyName");
       expect(result).toBeNull();
+    });
+  });
+
+  describe("findOneById method", () => {
+    it('should return a company if id exists', async () => {
+      const company = await prismaService.company.create({ data: createTestCompanyDto() });
+      const result = await companyRepository.findOneById(company.id);
+      expect(result.id).not.toBeNull();
+      expect(result).toMatchObject(company);
+    });
+    it('should return null if id is not a reference to a real company record', async () => {
+      const company = await prismaService.company.create({ data: createTestCompanyDto() });
+      const result = await companyRepository.findOneById(faker.string.uuid());
+      expect(result).toBeNull();
+    });
+    it('should throw an exception when id is not a uuid', async () => {
+      expect(companyRepository.findOneById("FAKE_ID")).rejects.toThrow(PrismaClientKnownRequestError);
     });
   });
 

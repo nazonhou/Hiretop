@@ -9,6 +9,7 @@ import { IsCompanyNameAlreadyExistConstraint } from './company-name-constraint';
 import { CompanyModule } from '@company/company.module';
 import { IsSkillNameAlreadyExistConstraint } from './skill-name-constraint';
 import { ArraySkillConstraint } from './user-skills-constraint';
+import { IsCompanyIdConstraint } from './company-id-constraint';
 
 
 @Module({
@@ -22,7 +23,8 @@ import { ArraySkillConstraint } from './user-skills-constraint';
     IsUserPhoneNumberAlreadyExistConstraint,
     IsCompanyNameAlreadyExistConstraint,
     IsSkillNameAlreadyExistConstraint,
-    ArraySkillConstraint
+    ArraySkillConstraint,
+    IsCompanyIdConstraint
   ],
   imports: [UserModule, CompanyModule]
 })

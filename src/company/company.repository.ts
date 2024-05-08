@@ -21,4 +21,8 @@ export class CompanyRepository {
   findOneByName(name: string) {
     return this.prismaService.company.findUnique({ where: { name } });
   }
+
+  findOneById(id: string) {
+    return this.prismaService.company.findUnique({ where: { id } });
+  }
 }

@@ -177,6 +177,15 @@ describe('[POST] /company-users (e2e)', () => {
       expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
       expect(result.body).toHaveProperty("companyName");
     });
+
+    it('should return 422 when category value is not a valid CompanyCategory', async () => {
+      const result = await request(app.getHttpServer())
+        .post('/company-users')
+        .send({ category: "BAD_VALUE" });
+
+      expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+      expect(result.body).toHaveProperty("category");
+    });
   });
 
   describe("Body validation pass", () => {
