@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { Authenticated } from '@user/user.decorator';
+import { Authenticated } from '@user/authenticated.decorator';
 import { CreateWorkExperienceDto } from './create-work-experience.dto';
 import { TokenPayload } from '@auth/auth.service';
 import { WorkExperienceService } from './work-experience.service';

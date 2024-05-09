@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateProfileDto } from './update-profile-dto';
-import { Authenticated } from './user.decorator';
+import { Authenticated } from './authenticated.decorator';
 import { TokenPayload } from '@auth/auth.service';
 import { CreateSkillDto } from '@skill/create-skill.dto';
 import { UpdateSkillsDto } from './update-skills.dto';

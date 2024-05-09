@@ -6,6 +6,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { UserModule } from '@user/user.module';
+import { RolesGuard } from './roles.guard';
+import { CompanyUserGuard } from './company-user.guard';
 
 @Module({
   controllers: [AuthController],
@@ -14,6 +16,14 @@ import { UserModule } from '@user/user.module';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: CompanyUserGuard,
     }
   ],
   imports: [

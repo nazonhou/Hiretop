@@ -80,8 +80,8 @@ CREATE TABLE "job_offers" (
     "location_type" "LocationType",
     "company_id" UUID NOT NULL,
     "posted_at" TIMESTAMP(3) NOT NULL,
-    "expired_at" TIMESTAMP(3),
-    "user_id" UUID NOT NULL,
+    "expired_at" TIMESTAMP(3) NOT NULL,
+    "author_id" UUID NOT NULL,
 
     CONSTRAINT "job_offers_pkey" PRIMARY KEY ("id")
 );
@@ -153,7 +153,7 @@ ALTER TABLE "work_experiences" ADD CONSTRAINT "work_experiences_company_id_fkey"
 ALTER TABLE "job_offers" ADD CONSTRAINT "job_offers_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "job_offers" ADD CONSTRAINT "job_offers_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "job_offers" ADD CONSTRAINT "job_offers_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_UserSkills" ADD CONSTRAINT "_UserSkills_A_fkey" FOREIGN KEY ("A") REFERENCES "skills"("id") ON DELETE CASCADE ON UPDATE CASCADE;

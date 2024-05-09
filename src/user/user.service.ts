@@ -56,4 +56,8 @@ export class UserService {
   findUserSkills(userId: string) {
     return this.skillRepository.findUserSkills(userId);
   }
+
+  findOneById(userId: string) {
+    return this.userRepository.findOneById(userId);
+  }
 }

@@ -1,14 +1,14 @@
 import { PrismaService } from '@prisma-module/prisma.service';
-import { WorkExperienceRepository } from './work-experience.repository';
+import { JobOfferRepository } from './job-offer.repository';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import * as util from "util";
 import { exec } from "child_process";
 import { Test } from '@nestjs/testing';
 import TestingPrismaService from '@src/testing.prisma.service';
-import { cleanTestDatabase, createTestCompanyDto, createTestUserDto, createTestWorkExperienceDto } from '@src/test-utils';
+import { cleanTestDatabase, createTestCompanyDto, createTestJobOfferDto, createTestSkillDto, createTestUserDto, createTestWorkExperienceDto } from '@src/test-utils';
 
-describe('WorkExperienceRepository', () => {
-  let workExperienceRepository: WorkExperienceRepository;
+describe('JobOfferRepository', () => {
+  let jobOfferRepository: JobOfferRepository;
   let prismaService: PrismaService;
   let container: StartedPostgreSqlContainer;
 
@@ -34,13 +34,13 @@ describe('WorkExperienceRepository', () => {
     };
 
     const moduleRef = await Test.createTestingModule({
-      providers: [WorkExperienceRepository, PrismaService],
+      providers: [JobOfferRepository, PrismaService],
     })
       .overrideProvider(PrismaService)
       .useValue(TestingPrismaService)
       .compile();
 
-    workExperienceRepository = moduleRef.get<WorkExperienceRepository>(WorkExperienceRepository);
+    jobOfferRepository = moduleRef.get<JobOfferRepository>(JobOfferRepository);
     prismaService = moduleRef.get<PrismaService>(PrismaService);
 
     await cleanTestDatabase(prismaService);
@@ -51,22 +51,24 @@ describe('WorkExperienceRepository', () => {
     await prismaService.$disconnect();
   });
 
-  describe('createWorkExperience', () => {
-    it('Should insert a new work experience into the database', async () => {
+  describe('createJobOffer', () => {
+    it('Should insert a new jobOffer into the database', async () => {
       const [user, company] = await Promise.all([
         prismaService.user.create({ data: createTestUserDto() }),
-        prismaService.company.create({ data: createTestCompanyDto() })
+        prismaService.company.create({ data: createTestCompanyDto() }),
       ]);
-      const result = await workExperienceRepository.createWorkExperience(
+      const skill = await prismaService.skill.create({ data: { ...createTestSkillDto(), authorId: user.id } });
+      const result = await jobOfferRepository.createJobOffer(
         user.id,
-        createTestWorkExperienceDto(company.id)
+        company.id,
+        createTestJobOfferDto([skill.id])
       );
 
-      const workExperience = await prismaService.workExperience.findUnique({ where: { id: result.id } });
-      expect(workExperience).not.toBeNull();
-      expect(workExperience).toMatchObject(result);
-      expect(workExperience.userId).toBe(user.id);
-      expect(workExperience.companyId).toBe(company.id);
+      const jobOffer = await prismaService.jobOffer.findUnique({ where: { id: result.id } });
+      expect(jobOffer).not.toBeNull();
+      expect(jobOffer).toMatchObject(result);
+      expect(jobOffer.authorId).toBe(user.id);
+      expect(jobOffer.companyId).toBe(company.id);
     });
   });
 });

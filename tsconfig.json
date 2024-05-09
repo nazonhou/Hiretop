@@ -50,6 +50,9 @@
       "@work-experience/*": [
         "./src/work-experience/*"
       ],
+      "@job-offer/*": [
+        "./src/job-offer/*"
+      ],
       "@src/*": [
         "./src/*"
       ]

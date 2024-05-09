@@ -4,7 +4,7 @@ import { Test } from '@nestjs/testing';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { exec } from "child_process";
 import * as util from "util";
-import { createTestCompanyDto, createTestUser } from '@src/test-utils';
+import { cleanTestDatabase, createTestCompanyDto, createTestUser } from '@src/test-utils';
 import TestingPrismaService from '@src/testing.prisma.service';
 import { faker } from '@faker-js/faker';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -17,7 +17,7 @@ describe('CompanyRepository', () => {
   const originalEnv = process.env;
 
   beforeAll(async () => {
-    container = await new PostgreSqlContainer().start();
+    container = await new PostgreSqlContainer(process.env.TESTING_DATABASE_IMAGE).start();
 
     await util.promisify(exec)(`npx prisma db push`, {
       env: { DATABASE_URL: container.getConnectionUri() }
@@ -45,11 +45,7 @@ describe('CompanyRepository', () => {
     companyRepository = moduleRef.get<CompanyRepository>(CompanyRepository);
     prismaService = moduleRef.get<PrismaService>(PrismaService);
 
-    await prismaService.$transaction([
-      prismaService.companyUser.deleteMany(),
-      prismaService.company.deleteMany(),
-      prismaService.user.deleteMany(),
-    ]);
+    await cleanTestDatabase(prismaService);
   });
 
   afterEach(async () => {
@@ -61,6 +57,7 @@ describe('CompanyRepository', () => {
     it('should insert company into database', async () => {
       const createCompanyDto = createTestCompanyDto();
 
+      expect(await prismaService.company.count()).toBe(0);
       const result = await companyRepository.create(createCompanyDto);
       expect(await prismaService.company.count()).toBe(1);
       expect(await prismaService.company.findUnique({ where: { id: result.id } })).not.toBeNull();

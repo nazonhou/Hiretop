@@ -9,8 +9,9 @@ import { APP_PIPE } from "@nestjs/core";
 import { JwtModule, JwtService } from "@nestjs/jwt";
 import { Test, TestingModule } from "@nestjs/testing";
 import { PrismaService } from "@prisma-module/prisma.service";
+import { Company, CompanyUser, Role, RoleUser, User } from "@prisma/client";
 import { SkillRepository } from "@skill/skill.repository";
-import { createTestUser } from "@src/test-utils";
+import { createTestCompany, createTestUser } from "@src/test-utils";
 import { UserRepository } from "@user/user.repository";
 import { UserService } from "@user/user.service";
 import { getValidationPipeOptions } from "@validation/validation.module";
@@ -134,14 +135,42 @@ describe('[POST] /auth/login (e2e)', () => {
   describe('Email found in DB', () => {
     const saltRounds = 1;
     const jwtSecret = 'JWT_SECRET_TEST';
-    const user = { ...createTestUser(), password: "$2a$04$s3ZDcxv/x6T4fSqmbztx7ufg/gvrdsvc1IaqAJJN9w8HjipdKIhnq" };
-    const findOneByEmailMock = jest.fn((email: string) => Promise.resolve(user));
+    const company = createTestCompany();
+    const userId = faker.string.uuid();
+    const companyUser: CompanyUser & { company: Company } = {
+      companyId: company.id,
+      userId,
+      company
+    };
+    const rolesUser: RoleUser[] = [{
+      userId,
+      role: faker.helpers.enumValue(Role)
+    }]
+    const userWithoutDependencies: User = {
+      ...createTestUser(),
+      id: userId,
+      password: "$2a$04$s3ZDcxv/x6T4fSqmbztx7ufg/gvrdsvc1IaqAJJN9w8HjipdKIhnq"
+    };
+    const user: User
+      & { companyUser: CompanyUser }
+      & { rolesUser: RoleUser[] } = {
+      ...userWithoutDependencies,
+      companyUser,
+      rolesUser
+    };
+    const findOneByEmailMock = jest.fn(
+      (email: string) => Promise.resolve(userWithoutDependencies)
+    );
     const userRepositoryMock = {
-      findOneByEmail: findOneByEmailMock
+      findOneByEmail: findOneByEmailMock,
+      findOneById: jest.fn(
+        (userId: string) => Promise.resolve(user)
+      )
     }
     let jwtService: JwtService;
     beforeEach(async () => {
       findOneByEmailMock.mockClear();
+      userRepositoryMock.findOneById.mockClear();
       jest.resetModules();
       process.env = {
         ...originalEnv,
@@ -188,6 +217,9 @@ describe('[POST] /auth/login (e2e)', () => {
 
       expect(result.status).toEqual(HttpStatus.OK);
       expect(findOneByEmailMock).toHaveBeenCalledTimes(1);
+      expect(findOneByEmailMock.mock.calls[0][0]).toBe(user.email);
+      expect(userRepositoryMock.findOneById).toHaveBeenCalledTimes(1);
+      expect(userRepositoryMock.findOneById.mock.calls[0][0]).toBe(user.id);
       expect(jwtService.verifyAsync(result.body['access_token'], { secret: jwtSecret }))
         .resolves
         .toMatchObject({ sub: user.id, email: user.email })

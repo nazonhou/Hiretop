@@ -10,6 +10,7 @@ import { ValidationModule } from './validation/validation.module';
 import { RequestInterceptorModule } from './request-interceptor/request-interceptor.module';
 import { SkillModule } from './skill/skill.module';
 import { WorkExperienceModule } from './work-experience/work-experience.module';
+import { JobOfferModule } from './job-offer/job-offer.module';
 import jwtConfig from '@config/jwt.config';
 import hashConfig from '@config/hash.config';
 
@@ -27,6 +28,7 @@ import hashConfig from '@config/hash.config';
     RequestInterceptorModule,
     SkillModule,
     WorkExperienceModule,
+    JobOfferModule,
   ],
   controllers: [AppController],
   providers: [AppService],

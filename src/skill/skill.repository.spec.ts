@@ -5,7 +5,7 @@ import * as util from "util";
 import { exec } from "child_process";
 import { Test } from '@nestjs/testing';
 import TestingPrismaService from '@src/testing.prisma.service';
-import { createTestSkillDto, createTestUserDto } from '@src/test-utils';
+import { cleanTestDatabase, createTestSkillDto, createTestUserDto } from '@src/test-utils';
 import { faker } from '@faker-js/faker';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
@@ -17,7 +17,7 @@ describe('SkillRepository', () => {
   const originalEnv = process.env;
 
   beforeAll(async () => {
-    container = await new PostgreSqlContainer().start();
+    container = await new PostgreSqlContainer(process.env.TESTING_DATABASE_IMAGE).start();
 
     await util.promisify(exec)(`npx prisma db push`, {
       env: { DATABASE_URL: container.getConnectionUri() }
@@ -45,10 +45,7 @@ describe('SkillRepository', () => {
     skillRepository = moduleRef.get<SkillRepository>(SkillRepository);
     prismaService = moduleRef.get<PrismaService>(PrismaService);
 
-    await prismaService.$transaction([
-      prismaService.skill.deleteMany(),
-      prismaService.user.deleteMany()
-    ]);
+    await cleanTestDatabase(prismaService);
   });
 
   afterEach(async () => {

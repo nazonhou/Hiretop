@@ -14,7 +14,7 @@ import { UserController } from "@user/user.controller";
 import { UserRepository } from "@user/user.repository";
 import { UserService } from "@user/user.service";
 import { IsSkillNameAlreadyExistConstraint } from "@validation/skill-name-constraint";
-import { ArraySkillConstraint } from "@validation/user-skills-constraint";
+import { ArraySkillConstraint } from "@validation/array-skills-constraint";
 import { getValidationPipeOptions } from "@validation/validation.module";
 import { ValidationService } from "@validation/validation.service";
 import * as request from 'supertest';

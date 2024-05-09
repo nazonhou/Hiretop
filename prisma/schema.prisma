@@ -130,9 +130,9 @@ model JobOffer {
   company      Company       @relation(fields: [companyId], references: [id])
   companyId    String        @map("company_id") @db.Uuid
   postedAt     DateTime      @map("posted_at")
-  expiredAt    DateTime?     @map("expired_at")
-  author       User          @relation(fields: [userId], references: [id])
-  userId       String        @map("user_id") @db.Uuid
+  expiredAt    DateTime      @map("expired_at")
+  author       User          @relation(fields: [authorId], references: [id])
+  authorId     String        @map("author_id") @db.Uuid
 
   @@map("job_offers")
 }

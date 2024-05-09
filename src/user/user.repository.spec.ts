@@ -4,10 +4,11 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { exec } from "child_process";
 import * as util from "util";
 import { Test } from '@nestjs/testing';
-import { createCompanyUserDto, createTestSkillDto, createTestUserDto, createUpdateProfileDto } from '@src/test-utils';
-import { Role } from '@prisma/client';
+import { cleanTestDatabase, createCompanyUserDto, createTestCompanyDto, createTestSkillDto, createTestUserDto, createUpdateProfileDto } from '@src/test-utils';
+import { CompanyUser, Role } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import TestingPrismaService from '@src/testing.prisma.service';
+import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
 
 describe('UserRepository', () => {
   let userRepository: UserRepository;
@@ -17,7 +18,7 @@ describe('UserRepository', () => {
   const originalEnv = process.env;
 
   beforeAll(async () => {
-    container = await new PostgreSqlContainer().start();
+    container = await new PostgreSqlContainer(process.env.TESTING_DATABASE_IMAGE).start();
 
     await util.promisify(exec)(`npx prisma db push`, {
       env: { DATABASE_URL: container.getConnectionUri() }
@@ -45,13 +46,7 @@ describe('UserRepository', () => {
     userRepository = moduleRef.get<UserRepository>(UserRepository);
     prismaService = moduleRef.get<PrismaService>(PrismaService);
 
-    await prismaService.$transaction([
-      prismaService.roleUser.deleteMany(),
-      prismaService.companyUser.deleteMany(),
-      prismaService.skill.deleteMany(),
-      prismaService.user.deleteMany(),
-      prismaService.company.deleteMany()
-    ]);
+    await cleanTestDatabase(prismaService);
   });
 
   afterEach(async () => {
@@ -159,6 +154,17 @@ describe('UserRepository', () => {
       expect(user.companyUser.company.category).toBe(dto.category);
       expect(usersCount === 1 && companiesCount === 1 && roleUsersCount === 1 && companyUsersCount === 1).toBeTruthy();
     });
+    it("should throw an exception when attempting to link a companyUser with another company", async () => {
+      const dto = createCompanyUserDto();
+      const [user, company] = await Promise.all([
+        userRepository.createCompanyUser(dto),
+        prismaService.company.create({ data: createTestCompanyDto() })
+      ]);
+
+      expect(prismaService.companyUser.create({ data: { companyId: company.id, userId: user.id } }))
+        .rejects
+        .toThrow(PrismaClientKnownRequestError);
+    });
   });
 
   describe("updateUser", () => {
@@ -189,6 +195,51 @@ describe('UserRepository', () => {
       const result = await userRepository.updateSkills(user.id, []);
 
       expect((await prismaService.skill.findMany({ where: { users: { some: { id: user.id } } } })).length).toBe(0);
+    });
+  });
+
+
+  describe("findOneById", () => {
+    it("should find a user when it exists", async () => {
+      const [user, company] = await Promise.all([
+        prismaService.user.create({ data: createTestUserDto() }),
+        prismaService.company.create({ data: createTestCompanyDto() })
+      ]);
+
+      const role = faker.helpers.enumValue(Role);
+
+      await Promise.all([
+        prismaService.roleUser.create({
+          data: { role, user: { connect: { id: user.id } } }
+        }),
+        prismaService.companyUser.create({
+          data: {
+            company: { connect: { id: company.id } },
+            user: { connect: { id: user.id } }
+          }
+        })
+      ]);
+
+      const result = await userRepository.findOneById(user.id);
+
+      expect(result).toMatchObject(user);
+      expect(result.rolesUser.length).toBe(1);
+      expect(result.rolesUser[0].role).toBe(role);
+      expect(result.companyUser).not.toBeNull();
+      expect(result.companyUser.company).toMatchObject(company);
+    });
+    it("should not find a user when it does not exists", async () => {
+      await prismaService.user.create({ data: createTestUserDto() });
+      const result = await userRepository.findOneById(faker.string.uuid());
+      expect(result).toBeNull();
+    });
+    it("should find a user with any roles and no company when it does not have", async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const result = await userRepository.findOneById(user.id);
+      expect(result).not.toBeNull();
+      expect(result.rolesUser.length).toBe(0);
+      expect(result.companyUser).toBeNull();
+      expect(result).toMatchObject(user);
     });
   });
 });

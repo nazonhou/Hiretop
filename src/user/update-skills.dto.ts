@@ -1,4 +1,4 @@
-import { ArraySkill } from "@validation/user-skills-constraint";
+import { ArraySkill } from "@validation/array-skills-constraint";
 import { ArrayNotEmpty, IsArray } from "class-validator";
 
 export class UpdateSkillsDto {

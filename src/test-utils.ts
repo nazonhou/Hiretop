@@ -1,6 +1,6 @@
 import { CreateTalentDto } from "@user/create-talent.dto";
 import { faker } from '@faker-js/faker';
-import { Company, CompanyCategory, JobType, LocationType, User, WorkExperience } from '@prisma/client';
+import { Company, CompanyCategory, JobOffer, JobType, LocationType, Role, User, WorkExperience } from '@prisma/client';
 import { CreateCompanyDto } from "@company/create-company.dto";
 import { CreateCompanyUserDto } from "@user/create-company-user.dto";
 import { UpdateProfileDto } from "@user/update-profile-dto";
@@ -9,6 +9,8 @@ import { Request, Response, NextFunction } from 'express';
 import { CreateSkillDto } from "@skill/create-skill.dto";
 import { UpdateSkillsDto } from "@user/update-skills.dto";
 import { CreateWorkExperienceDto } from "@work-experience/create-work-experience.dto";
+import { PrismaService } from "@prisma-module/prisma.service";
+import { CreateJobOfferDto } from "@job-offer/create-job-offer.dto";
 
 export function createTestUserDto(): CreateTalentDto {
   const dto = new CreateTalentDto();
@@ -87,8 +89,18 @@ export function createTestSkill() {
   return { ...createTestSkillDto(), id: faker.string.uuid(), authorId: faker.string.uuid() };
 }
 
-export function createAuthenticated(): TokenPayload {
-  return { email: faker.internet.email(), sub: faker.string.uuid() };
+export function createAuthenticated(options?: {
+  roles?: Role[], company?: { id: string, name: string }
+}): TokenPayload {
+  const payload: TokenPayload = {
+    email: faker.internet.email(),
+    sub: faker.string.uuid(),
+    roles: options?.roles ?? []
+  };
+  if (options?.company) {
+    payload.company = options.company;
+  }
+  return payload;
 }
 
 export function createTestUpdateSkillsDto(): UpdateSkillsDto {
@@ -121,4 +133,38 @@ export function createTestWorkExperience(): WorkExperience {
     startedAt: faker.date.recent(),
     endedAt: faker.date.soon(),
   };
+}
+
+export function cleanTestDatabase(prismaService: PrismaService) {
+  return prismaService.$transaction([
+    prismaService.skill.deleteMany(),
+    prismaService.companyUser.deleteMany(),
+    prismaService.jobOffer.deleteMany(),
+    prismaService.roleUser.deleteMany(),
+    prismaService.workExperience.deleteMany(),
+    prismaService.jobOffer.deleteMany(),
+    prismaService.company.deleteMany(),
+    prismaService.user.deleteMany()
+  ]);
+}
+
+export function createTestJobOfferDto(skillIds: string[]): CreateJobOfferDto {
+  const createJobOfferDto = new CreateJobOfferDto();
+  createJobOfferDto.expiredAt = faker.date.soon();
+  createJobOfferDto.locationType = faker.helpers.enumValue(LocationType);
+  createJobOfferDto.skillIds = skillIds;
+  createJobOfferDto.type = faker.helpers.enumValue(JobType);
+  return createJobOfferDto;
+}
+
+export function createTestJobOffer(): JobOffer {
+  return {
+    authorId: faker.string.uuid(),
+    companyId: faker.string.uuid(),
+    expiredAt: faker.date.soon(),
+    id: faker.string.uuid(),
+    locationType: faker.helpers.enumValue(LocationType),
+    postedAt: faker.date.recent(),
+    type: faker.helpers.enumValue(JobType)
+  }
 }

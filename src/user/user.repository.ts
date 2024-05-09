@@ -104,4 +104,14 @@ export class UserRepository {
 
     return userWithUpdatedSkills.skills
   }
+
+  findOneById(userId: string) {
+    return this.prismaService.user.findUnique({
+      where: { id: userId },
+      include: {
+        companyUser: { include: { company: true } },
+        rolesUser: true
+      }
+    });
+  }
 }
