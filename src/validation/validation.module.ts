@@ -10,6 +10,7 @@ import { CompanyModule } from '@company/company.module';
 import { IsSkillNameAlreadyExistConstraint } from './skill-name-constraint';
 import { ArraySkillConstraint } from './array-skills-constraint';
 import { IsCompanyIdConstraint } from './company-id-constraint';
+import { SkillModule } from '@skill/skill.module';
 
 
 @Module({
@@ -26,7 +27,7 @@ import { IsCompanyIdConstraint } from './company-id-constraint';
     ArraySkillConstraint,
     IsCompanyIdConstraint
   ],
-  imports: [UserModule, CompanyModule]
+  imports: [UserModule, CompanyModule, SkillModule]
 })
 export class ValidationModule {}
 
@@ -39,5 +40,10 @@ export function exceptionFactory(errors: ValidationError[]) {
 };
 
 export function getValidationPipeOptions(): ValidationPipeOptions {
-  return { whitelist: false, transform: true, exceptionFactory };
+  return {
+    whitelist: false,
+    transform: true,
+    exceptionFactory,
+    transformOptions: { enableImplicitConversion: true },
+  };
 } 

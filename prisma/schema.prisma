@@ -124,6 +124,7 @@ model WorkExperience {
 
 model JobOffer {
   id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description  String
   type         JobType?
   locationType LocationType? @map("location_type")
   skills       Skill[]

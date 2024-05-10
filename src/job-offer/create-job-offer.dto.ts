@@ -4,6 +4,9 @@ import { Type } from "class-transformer";
 import { IsArray, IsDate, IsEnum, IsNotEmpty, IsOptional, MinDate } from "class-validator";
 
 export class CreateJobOfferDto {
+  @IsNotEmpty()
+  description: string;
+
   @IsEnum(JobType)
   @IsOptional()
   type?: JobType;

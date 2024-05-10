@@ -11,6 +11,8 @@ import { UpdateSkillsDto } from "@user/update-skills.dto";
 import { CreateWorkExperienceDto } from "@work-experience/create-work-experience.dto";
 import { PrismaService } from "@prisma-module/prisma.service";
 import { CreateJobOfferDto } from "@job-offer/create-job-offer.dto";
+import { RawJobOfferDto } from "@job-offer/raw-job-offer.dto";
+import { SearchJobOfferDto } from "@job-offer/search-job-offer.dto";
 
 export function createTestUserDto(): CreateTalentDto {
   const dto = new CreateTalentDto();
@@ -154,6 +156,7 @@ export function createTestJobOfferDto(skillIds: string[]): CreateJobOfferDto {
   createJobOfferDto.locationType = faker.helpers.enumValue(LocationType);
   createJobOfferDto.skillIds = skillIds;
   createJobOfferDto.type = faker.helpers.enumValue(JobType);
+  createJobOfferDto.description = faker.lorem.paragraph();
   return createJobOfferDto;
 }
 
@@ -165,6 +168,36 @@ export function createTestJobOffer(): JobOffer {
     id: faker.string.uuid(),
     locationType: faker.helpers.enumValue(LocationType),
     postedAt: faker.date.recent(),
+    type: faker.helpers.enumValue(JobType),
+    description: faker.lorem.paragraph()
+  }
+}
+
+export function createTestRawJobOfferDto(): RawJobOfferDto {
+  return {
+    author_id: faker.string.uuid(),
+    company_category: faker.helpers.enumValue(CompanyCategory),
+    company_id: faker.string.uuid(),
+    company_name: faker.company.name(),
+    description: faker.lorem.paragraph(),
+    expired_at: faker.date.soon(),
+    id: faker.string.uuid(),
+    location_type: faker.helpers.enumValue(LocationType),
+    matched_skills: faker.number.int(),
+    matching_rate: faker.number.int(),
+    posted_at: faker.date.recent(),
+    total_count: faker.number.int(),
+    total_skills: faker.number.int(),
     type: faker.helpers.enumValue(JobType)
+  };
+}
+
+export function createTestSearchJobOfferDto(): SearchJobOfferDto {
+  return {
+    page: faker.number.int(),
+    perPage: faker.number.int(),
+    companyCategory: faker.helpers.enumValue(CompanyCategory),
+    jobType: faker.helpers.enumValue(JobType),
+    locationType: faker.helpers.enumValue(LocationType),
   }
 }

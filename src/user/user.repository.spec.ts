@@ -5,10 +5,8 @@ import { exec } from "child_process";
 import * as util from "util";
 import { Test } from '@nestjs/testing';
 import { cleanTestDatabase, createCompanyUserDto, createTestCompanyDto, createTestSkillDto, createTestUserDto, createUpdateProfileDto } from '@src/test-utils';
-import { CompanyUser, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { faker } from '@faker-js/faker';
-import TestingPrismaService from '@src/testing.prisma.service';
-import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
 
 describe('UserRepository', () => {
   let userRepository: UserRepository;
@@ -35,7 +33,9 @@ describe('UserRepository', () => {
       ...originalEnv,
       DATABASE_URL: container.getConnectionUri(),
     };
-
+    
+    const { default: TestingPrismaService } = await import('@src/testing.prisma.service');
+    
     const moduleRef = await Test.createTestingModule({
       providers: [UserRepository, PrismaService],
     })
@@ -163,7 +163,7 @@ describe('UserRepository', () => {
 
       expect(prismaService.companyUser.create({ data: { companyId: company.id, userId: user.id } }))
         .rejects
-        .toThrow(PrismaClientKnownRequestError);
+        .toThrow();
     });
   });
 

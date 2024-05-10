@@ -4,7 +4,6 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import * as util from "util";
 import { exec } from "child_process";
 import { Test } from '@nestjs/testing';
-import TestingPrismaService from '@src/testing.prisma.service';
 import { cleanTestDatabase, createTestCompanyDto, createTestUserDto, createTestWorkExperienceDto } from '@src/test-utils';
 
 describe('WorkExperienceRepository', () => {
@@ -32,6 +31,8 @@ describe('WorkExperienceRepository', () => {
       ...originalEnv,
       DATABASE_URL: container.getConnectionUri(),
     };
+
+    const { default: TestingPrismaService } = await import('@src/testing.prisma.service');
 
     const moduleRef = await Test.createTestingModule({
       providers: [WorkExperienceRepository, PrismaService],

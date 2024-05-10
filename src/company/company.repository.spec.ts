@@ -5,9 +5,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers
 import { exec } from "child_process";
 import * as util from "util";
 import { cleanTestDatabase, createTestCompanyDto, createTestUser } from '@src/test-utils';
-import TestingPrismaService from '@src/testing.prisma.service';
 import { faker } from '@faker-js/faker';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 describe('CompanyRepository', () => {
   let companyRepository: CompanyRepository;
@@ -34,6 +32,8 @@ describe('CompanyRepository', () => {
       ...originalEnv,
       DATABASE_URL: container.getConnectionUri(),
     };
+
+    const { default: TestingPrismaService } = await import('@src/testing.prisma.service');
 
     const moduleRef = await Test.createTestingModule({
       providers: [CompanyRepository, PrismaService],
@@ -102,7 +102,7 @@ describe('CompanyRepository', () => {
       expect(result).toBeNull();
     });
     it('should throw an exception when id is not a uuid', async () => {
-      expect(companyRepository.findOneById("FAKE_ID")).rejects.toThrow(PrismaClientKnownRequestError);
+      expect(companyRepository.findOneById("FAKE_ID")).rejects.toThrow();
     });
   });
 

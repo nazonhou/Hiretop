@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./jest-e2e.config.js",
-    "test:spec": "jest --config ./jest-spec.config.js --runInBand"
+    "test:spec": "jest --config ./jest-spec.config.js --runInBand",
+    "db:seed:search-job-offers": "ts-node prisma/search-job-offers.seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.8",

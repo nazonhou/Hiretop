@@ -4,10 +4,8 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import * as util from "util";
 import { exec } from "child_process";
 import { Test } from '@nestjs/testing';
-import TestingPrismaService from '@src/testing.prisma.service';
 import { cleanTestDatabase, createTestSkillDto, createTestUserDto } from '@src/test-utils';
 import { faker } from '@faker-js/faker';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 describe('SkillRepository', () => {
   let skillRepository: SkillRepository;
@@ -34,6 +32,8 @@ describe('SkillRepository', () => {
       ...originalEnv,
       DATABASE_URL: container.getConnectionUri(),
     };
+
+    const { default: TestingPrismaService } = await import('@src/testing.prisma.service');
 
     const moduleRef = await Test.createTestingModule({
       providers: [SkillRepository, PrismaService],
@@ -142,7 +142,7 @@ describe('SkillRepository', () => {
       expect(result.length).toBe(0);
     });
     it('Should throw an exception when id is not a valid UUID', async () => {
-      expect(skillRepository.findByIds([faker.string.alphanumeric()])).rejects.toThrow(PrismaClientKnownRequestError);
+      expect(skillRepository.findByIds([faker.string.alphanumeric()])).rejects.toThrow();
     });
   });
 

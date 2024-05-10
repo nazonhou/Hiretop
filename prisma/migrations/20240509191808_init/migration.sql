@@ -76,6 +76,7 @@ CREATE TABLE "work_experiences" (
 -- CreateTable
 CREATE TABLE "job_offers" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "description" TEXT NOT NULL,
     "type" "JobType",
     "location_type" "LocationType",
     "company_id" UUID NOT NULL,

@@ -233,7 +233,7 @@ describe('[POST] /job-offers (e2e)', () => {
       await app.close();
     });
 
-    it('Should return 422 when skillIds and expiredAt are not sent', async () => {
+    it('Should return 422 when description, skillIds and expiredAt are not sent', async () => {
       const result = await request(app.getHttpServer())
         .post('/job-offers')
         .send({});
@@ -243,6 +243,7 @@ describe('[POST] /job-offers (e2e)', () => {
       expect(mockedSkillRepository.findByIds).toHaveBeenCalledTimes(1);
       expect(result.body).toHaveProperty("skillIds");
       expect(result.body).toHaveProperty("expiredAt");
+      expect(result.body).toHaveProperty("description");
     });
 
     it('Should return 422 when skillId does not reference a real skill record', async () => {
