@@ -110,4 +110,13 @@ export class JobOfferRepository {
     query += 'group by jo.id ';
     return query;
   }
+
+  findOneUnexpired(jobOfferId: string) {
+    return this.prismaService.jobOffer.findUnique({
+      where: {
+        id: jobOfferId,
+        expiredAt: { gt: new Date() }
+      }
+    })
+  }
 }

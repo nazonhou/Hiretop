@@ -4,9 +4,11 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import * as util from "util";
 import { exec } from "child_process";
 import { Test } from '@nestjs/testing';
-import { cleanTestDatabase, createTestCompanyDto, createTestJobOfferDto, createTestSkillDto, createTestUserDto, createTestWorkExperienceDto } from '@src/test-utils';
+import { cleanTestDatabase, createTestCompanyDto, createTestJobOfferData, createTestJobOfferDto, createTestSkillDto, createTestUserDto, createTestWorkExperienceDto } from '@src/test-utils';
 import { generateDataToTestJobOfferSearching } from '@src/test-search-job-offer';
 import { SearchJobOfferDto } from './search-job-offer.dto';
+import { faker } from '@faker-js/faker';
+import { JobType, LocationType } from '@prisma/client';
 
 describe('JobOfferRepository', () => {
   let jobOfferRepository: JobOfferRepository;
@@ -156,6 +158,34 @@ describe('JobOfferRepository', () => {
           && jobOfferDto.location_type == locationType
           && jobOfferDto.type == jobType
       )).toBeTruthy()
+    });
+  });
+
+  describe('findOneUnexpired', () => {
+    it('Should find one when it exists and its not expired', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const jobOffer = await prismaService.jobOffer.create({
+        data: createTestJobOfferData({ userId: user.id })
+      });
+      const result = await jobOfferRepository.findOneUnexpired(jobOffer.id);
+      expect(result).not.toBeNull();
+      expect(result).toMatchObject(jobOffer);
+    });
+    it('Should not find anything when it exists but its expired', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const jobOffer = await prismaService.jobOffer.create({
+        data: { ...createTestJobOfferData({ userId: user.id }), expiredAt: faker.date.recent() }
+      });
+      const result = await jobOfferRepository.findOneUnexpired(jobOffer.id);
+      expect(result).toBeNull();
+    });
+    it('Should not find anything when it does not exists', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const jobOffer = await prismaService.jobOffer.create({
+        data: createTestJobOfferData({ userId: user.id })
+      });
+      const result = await jobOfferRepository.findOneUnexpired(faker.string.uuid());
+      expect(result).toBeNull();
     });
   });
 });

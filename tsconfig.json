@@ -53,6 +53,9 @@
       "@job-offer/*": [
         "./src/job-offer/*"
       ],
+      "@job-application/*": [
+        "./src/job-application/*"
+      ],
       "@src/*": [
         "./src/*"
       ]

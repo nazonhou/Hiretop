@@ -10,6 +10,9 @@ CREATE TYPE "JobType" AS ENUM ('FULL_TIME', 'PART_TIME', 'SELF_EMPLOYED', 'FREEL
 -- CreateEnum
 CREATE TYPE "LocationType" AS ENUM ('ON_SITE', 'HYBRID', 'REMOTE');
 
+-- CreateEnum
+CREATE TYPE "JobApplicationStatus" AS ENUM ('TO_ASSESS', 'REJECTED', 'ACCEPTED');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
@@ -88,6 +91,35 @@ CREATE TABLE "job_offers" (
 );
 
 -- CreateTable
+CREATE TABLE "job_applications" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "applied_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "status" "JobApplicationStatus" NOT NULL DEFAULT 'TO_ASSESS',
+    "job_offer_id" UUID NOT NULL,
+    "applicant_id" UUID NOT NULL,
+
+    CONSTRAINT "job_applications_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "job_interviews" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "job_application_id" UUID NOT NULL,
+
+    CONSTRAINT "job_interviews_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "application_feedbacks" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "job_application_id" UUID NOT NULL,
+    "message" TEXT NOT NULL,
+    "sent_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "application_feedbacks_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_UserSkills" (
     "A" UUID NOT NULL,
     "B" UUID NOT NULL
@@ -119,6 +151,15 @@ CREATE UNIQUE INDEX "company_user_company_id_user_id_key" ON "company_user"("com
 
 -- CreateIndex
 CREATE UNIQUE INDEX "skills_name_key" ON "skills"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "job_applications_applicant_id_job_offer_id_key" ON "job_applications"("applicant_id", "job_offer_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "job_interviews_job_application_id_key" ON "job_interviews"("job_application_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "application_feedbacks_job_application_id_key" ON "application_feedbacks"("job_application_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_UserSkills_AB_unique" ON "_UserSkills"("A", "B");
@@ -155,6 +196,18 @@ ALTER TABLE "job_offers" ADD CONSTRAINT "job_offers_company_id_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "job_offers" ADD CONSTRAINT "job_offers_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "job_applications" ADD CONSTRAINT "job_applications_job_offer_id_fkey" FOREIGN KEY ("job_offer_id") REFERENCES "job_offers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "job_applications" ADD CONSTRAINT "job_applications_applicant_id_fkey" FOREIGN KEY ("applicant_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "job_interviews" ADD CONSTRAINT "job_interviews_job_application_id_fkey" FOREIGN KEY ("job_application_id") REFERENCES "job_applications"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "application_feedbacks" ADD CONSTRAINT "application_feedbacks_job_application_id_fkey" FOREIGN KEY ("job_application_id") REFERENCES "job_applications"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_UserSkills" ADD CONSTRAINT "_UserSkills_A_fkey" FOREIGN KEY ("A") REFERENCES "skills"("id") ON DELETE CASCADE ON UPDATE CASCADE;

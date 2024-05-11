@@ -14,19 +14,20 @@ datasource db {
 }
 
 model User {
-  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email           String           @unique
-  password        String
-  name            String
-  address         String?
-  birthday        DateTime?
-  phoneNumber     String?          @unique @map("phone_number")
-  rolesUser       RoleUser[]
-  companyUser     CompanyUser?
-  skills          Skill[]          @relation("UserSkills")
-  skillsCreated   Skill[]          @relation("SkillAuthor")
-  workExperiences WorkExperience[]
-  JobOffer        JobOffer[]
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String           @unique
+  password         String
+  name             String
+  address          String?
+  birthday         DateTime?
+  phoneNumber      String?          @unique @map("phone_number")
+  rolesUser        RoleUser[]
+  companyUser      CompanyUser?
+  skills           Skill[]          @relation("UserSkills")
+  skillsCreated    Skill[]          @relation("SkillAuthor")
+  workExperiences  WorkExperience[]
+  jobOffersCreated JobOffer[]
+  jobApplications  JobApplication[]
 
   @@map("users")
 }
@@ -123,17 +124,57 @@ model WorkExperience {
 }
 
 model JobOffer {
-  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  description  String
-  type         JobType?
-  locationType LocationType? @map("location_type")
-  skills       Skill[]
-  company      Company       @relation(fields: [companyId], references: [id])
-  companyId    String        @map("company_id") @db.Uuid
-  postedAt     DateTime      @map("posted_at")
-  expiredAt    DateTime      @map("expired_at")
-  author       User          @relation(fields: [authorId], references: [id])
-  authorId     String        @map("author_id") @db.Uuid
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description     String
+  type            JobType?
+  locationType    LocationType?    @map("location_type")
+  skills          Skill[]
+  company         Company          @relation(fields: [companyId], references: [id])
+  companyId       String           @map("company_id") @db.Uuid
+  postedAt        DateTime         @map("posted_at")
+  expiredAt       DateTime         @map("expired_at")
+  author          User             @relation(fields: [authorId], references: [id])
+  authorId        String           @map("author_id") @db.Uuid
+  jobApplications JobApplication[]
 
   @@map("job_offers")
+}
+
+enum JobApplicationStatus {
+  TO_ASSESS
+  REJECTED
+  ACCEPTED
+}
+
+model JobApplication {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  appliedAt           DateTime             @default(now()) @map("applied_at")
+  status              JobApplicationStatus @default(TO_ASSESS)
+  jobOffer            JobOffer             @relation(fields: [jobOfferId], references: [id])
+  jobOfferId          String               @map("job_offer_id") @db.Uuid
+  applicant           User                 @relation(fields: [applicantId], references: [id])
+  applicantId         String               @map("applicant_id") @db.Uuid
+  jobInterview        JobInterview?
+  applicationFeedback ApplicationFeedback?
+
+  @@unique([applicantId, jobOfferId])
+  @@map("job_applications")
+}
+
+model JobInterview {
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id])
+  jobApplicationId String         @unique @map("job_application_id") @db.Uuid
+
+  @@map("job_interviews")
+}
+
+model ApplicationFeedback {
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id])
+  jobApplicationId String         @unique @map("job_application_id") @db.Uuid
+  message          String
+  sentAt           DateTime       @default(now()) @map("sent_at")
+
+  @@map("application_feedbacks")
 }

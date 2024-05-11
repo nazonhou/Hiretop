@@ -1,6 +1,6 @@
 import { CreateTalentDto } from "@user/create-talent.dto";
 import { faker } from '@faker-js/faker';
-import { Company, CompanyCategory, JobOffer, JobType, LocationType, Role, User, WorkExperience } from '@prisma/client';
+import { Company, CompanyCategory, JobApplication, JobApplicationStatus, JobOffer, JobType, LocationType, Role, User, WorkExperience } from '@prisma/client';
 import { CreateCompanyDto } from "@company/create-company.dto";
 import { CreateCompanyUserDto } from "@user/create-company-user.dto";
 import { UpdateProfileDto } from "@user/update-profile-dto";
@@ -199,5 +199,28 @@ export function createTestSearchJobOfferDto(): SearchJobOfferDto {
     companyCategory: faker.helpers.enumValue(CompanyCategory),
     jobType: faker.helpers.enumValue(JobType),
     locationType: faker.helpers.enumValue(LocationType),
+  }
+}
+
+export function createTestJobOfferData(options: { userId: string }) {
+  return {
+    description: faker.lorem.paragraph(),
+    expiredAt: faker.date.soon(),
+    postedAt: faker.date.recent(),
+    author: { connect: { id: options.userId } },
+    company: { create: createTestCompanyDto() },
+    locationType: faker.helpers.enumValue(LocationType),
+    type: faker.helpers.enumValue(JobType),
+    skills: { create: [{ ...createTestSkillDto(), author: { connect: { id: options.userId } } }] }
+  };
+}
+
+export function createTestJobApplication(): JobApplication {
+  return {
+    applicantId: faker.string.uuid(),
+    appliedAt: faker.date.recent(),
+    id: faker.string.uuid(),
+    jobOfferId: faker.string.uuid(),
+    status: faker.helpers.enumValue(JobApplicationStatus)
   }
 }
