@@ -4,16 +4,15 @@ import { PrismaService } from '@prisma-module/prisma.service';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import * as util from "util";
 import { exec } from "child_process";
-import { cleanTestDatabase } from '@src/test-utils';
+import { cleanTestDatabase, createTestingPrismaClient } from '@src/test-utils';
 import { generateDataToTestJobOfferSearching } from '@src/test-search-job-offer';
-import { JobApplicationStatus } from '@prisma/client';
+import { JobApplicationStatus, PrismaClient } from '@prisma/client';
 
 describe('JobApplicationRepository', () => {
   let jobApplicationRepository: JobApplicationRepository;
   let prismaService: PrismaService;
   let container: StartedPostgreSqlContainer;
-
-  const originalEnv = process.env;
+  let TestingPrismaService: PrismaClient;
 
   beforeAll(async () => {
     container = await new PostgreSqlContainer(process.env.TESTING_DATABASE_IMAGE).start();
@@ -21,20 +20,9 @@ describe('JobApplicationRepository', () => {
     await util.promisify(exec)(`npx prisma db push`, {
       env: { DATABASE_URL: container.getConnectionUri() }
     });
-  });
 
-  afterAll(async () => {
-    await container.stop();
-  });
-
-  beforeEach(async () => {
-    jest.resetModules();
-    process.env = {
-      ...originalEnv,
-      DATABASE_URL: container.getConnectionUri(),
-    };
-
-    const { default: TestingPrismaService } = await import('@src/testing.prisma.service');
+    TestingPrismaService = createTestingPrismaClient(container.getConnectionUri());
+    await TestingPrismaService.$connect();
 
     const moduleRef = await Test.createTestingModule({
       providers: [JobApplicationRepository, PrismaService],
@@ -45,13 +33,15 @@ describe('JobApplicationRepository', () => {
 
     jobApplicationRepository = moduleRef.get<JobApplicationRepository>(JobApplicationRepository);
     prismaService = moduleRef.get<PrismaService>(PrismaService);
-
-    await cleanTestDatabase(prismaService);
   });
 
-  afterEach(async () => {
-    process.env = originalEnv;
-    await prismaService.$disconnect();
+  afterAll(async () => {
+    await TestingPrismaService.$disconnect();
+    await container.stop();
+  });
+
+  beforeEach(async () => {
+    await cleanTestDatabase(TestingPrismaService);
   });
 
   describe('createJobApplication', () => {

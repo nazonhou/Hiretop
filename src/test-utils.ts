@@ -1,6 +1,6 @@
 import { CreateTalentDto } from "@user/create-talent.dto";
 import { faker } from '@faker-js/faker';
-import { Company, CompanyCategory, JobApplication, JobApplicationStatus, JobOffer, JobType, LocationType, Role, User, WorkExperience } from '@prisma/client';
+import { Company, CompanyCategory, JobApplication, JobApplicationStatus, JobOffer, JobType, LocationType, PrismaClient, Role, User, WorkExperience } from '@prisma/client';
 import { CreateCompanyDto } from "@company/create-company.dto";
 import { CreateCompanyUserDto } from "@user/create-company-user.dto";
 import { UpdateProfileDto } from "@user/update-profile-dto";
@@ -137,16 +137,16 @@ export function createTestWorkExperience(): WorkExperience {
   };
 }
 
-export function cleanTestDatabase(prismaService: PrismaService) {
-  return prismaService.$transaction([
-    prismaService.skill.deleteMany(),
-    prismaService.companyUser.deleteMany(),
-    prismaService.jobOffer.deleteMany(),
-    prismaService.roleUser.deleteMany(),
-    prismaService.workExperience.deleteMany(),
-    prismaService.jobOffer.deleteMany(),
-    prismaService.company.deleteMany(),
-    prismaService.user.deleteMany()
+export function cleanTestDatabase(prismaClient: PrismaClient) {
+  return prismaClient.$transaction([
+    prismaClient.skill.deleteMany(),
+    prismaClient.companyUser.deleteMany(),
+    prismaClient.jobOffer.deleteMany(),
+    prismaClient.roleUser.deleteMany(),
+    prismaClient.workExperience.deleteMany(),
+    prismaClient.jobOffer.deleteMany(),
+    prismaClient.company.deleteMany(),
+    prismaClient.user.deleteMany()
   ]);
 }
 
@@ -223,4 +223,8 @@ export function createTestJobApplication(): JobApplication {
     jobOfferId: faker.string.uuid(),
     status: faker.helpers.enumValue(JobApplicationStatus)
   }
+}
+
+export function createTestingPrismaClient(datasourceUrl: string) {
+  return new PrismaClient({ datasourceUrl });
 }

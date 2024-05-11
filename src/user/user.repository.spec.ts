@@ -4,16 +4,15 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { exec } from "child_process";
 import * as util from "util";
 import { Test } from '@nestjs/testing';
-import { cleanTestDatabase, createCompanyUserDto, createTestCompanyDto, createTestSkillDto, createTestUserDto, createUpdateProfileDto } from '@src/test-utils';
-import { Role } from '@prisma/client';
+import { cleanTestDatabase, createCompanyUserDto, createTestCompanyDto, createTestSkillDto, createTestUserDto, createTestingPrismaClient, createUpdateProfileDto } from '@src/test-utils';
+import { PrismaClient, Role } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 
 describe('UserRepository', () => {
   let userRepository: UserRepository;
   let prismaService: PrismaService;
   let container: StartedPostgreSqlContainer;
-
-  const originalEnv = process.env;
+  let TestingPrismaService: PrismaClient;
 
   beforeAll(async () => {
     container = await new PostgreSqlContainer(process.env.TESTING_DATABASE_IMAGE).start();
@@ -21,21 +20,10 @@ describe('UserRepository', () => {
     await util.promisify(exec)(`npx prisma db push`, {
       env: { DATABASE_URL: container.getConnectionUri() }
     });
-  });
 
-  afterAll(async () => {
-    await container.stop();
-  })
+    TestingPrismaService = createTestingPrismaClient(container.getConnectionUri());
+    await TestingPrismaService.$connect();
 
-  beforeEach(async () => {
-    jest.resetModules();
-    process.env = {
-      ...originalEnv,
-      DATABASE_URL: container.getConnectionUri(),
-    };
-    
-    const { default: TestingPrismaService } = await import('@src/testing.prisma.service');
-    
     const moduleRef = await Test.createTestingModule({
       providers: [UserRepository, PrismaService],
     })
@@ -45,13 +33,15 @@ describe('UserRepository', () => {
 
     userRepository = moduleRef.get<UserRepository>(UserRepository);
     prismaService = moduleRef.get<PrismaService>(PrismaService);
-
-    await cleanTestDatabase(prismaService);
   });
 
-  afterEach(async () => {
-    process.env = originalEnv;
-    await prismaService.$disconnect();
+  afterAll(async () => {
+    await TestingPrismaService.$disconnect();
+    await container.stop();
+  });
+
+  beforeEach(async () => {
+    await cleanTestDatabase(TestingPrismaService);
   });
 
   it('should be defined', () => {

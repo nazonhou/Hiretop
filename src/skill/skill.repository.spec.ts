@@ -4,15 +4,15 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import * as util from "util";
 import { exec } from "child_process";
 import { Test } from '@nestjs/testing';
-import { cleanTestDatabase, createTestSkillDto, createTestUserDto } from '@src/test-utils';
+import { cleanTestDatabase, createTestSkillDto, createTestUserDto, createTestingPrismaClient } from '@src/test-utils';
 import { faker } from '@faker-js/faker';
+import { PrismaClient } from '@prisma/client';
 
 describe('SkillRepository', () => {
   let skillRepository: SkillRepository;
   let prismaService: PrismaService;
   let container: StartedPostgreSqlContainer;
-
-  const originalEnv = process.env;
+  let TestingPrismaService: PrismaClient;
 
   beforeAll(async () => {
     container = await new PostgreSqlContainer(process.env.TESTING_DATABASE_IMAGE).start();
@@ -20,20 +20,9 @@ describe('SkillRepository', () => {
     await util.promisify(exec)(`npx prisma db push`, {
       env: { DATABASE_URL: container.getConnectionUri() }
     });
-  });
 
-  afterAll(async () => {
-    await container.stop();
-  });
-
-  beforeEach(async () => {
-    jest.resetModules();
-    process.env = {
-      ...originalEnv,
-      DATABASE_URL: container.getConnectionUri(),
-    };
-
-    const { default: TestingPrismaService } = await import('@src/testing.prisma.service');
+    TestingPrismaService = createTestingPrismaClient(container.getConnectionUri());
+    await TestingPrismaService.$connect();
 
     const moduleRef = await Test.createTestingModule({
       providers: [SkillRepository, PrismaService],
@@ -44,13 +33,15 @@ describe('SkillRepository', () => {
 
     skillRepository = moduleRef.get<SkillRepository>(SkillRepository);
     prismaService = moduleRef.get<PrismaService>(PrismaService);
-
-    await cleanTestDatabase(prismaService);
   });
 
-  afterEach(async () => {
-    process.env = originalEnv;
-    await prismaService.$disconnect();
+  afterAll(async () => {
+    await TestingPrismaService.$disconnect();
+    await container.stop();
+  });
+
+  beforeEach(async () => {
+    await cleanTestDatabase(TestingPrismaService);
   });
 
   describe('createSkill', () => {
