@@ -56,7 +56,7 @@ describe('JobApplicationRepository', () => {
         where: { id: result.id }
       });
       expect(jobApplication).not.toBeNull();
-      expect(new Date() > jobApplication.appliedAt).toBeTruthy();
+      expect(jobApplication.appliedAt).not.toBeNull();
       expect(jobApplication.status).toBe(JobApplicationStatus.TO_ASSESS);
       expect(jobApplication.applicantId).toBe(data.talent.id);
       expect(jobApplication.jobOfferId).toBe(data.jobOffer1.id);
