@@ -149,6 +149,25 @@ describe('JobOfferRepository', () => {
           && jobOfferDto.type == jobType
       )).toBeTruthy()
     });
+    it('Should not retrieve any jobOffer when only jobOffer3 is posted', async () => {
+      const searchJobOfferSeedData = await generateDataToTestJobOfferSearching(prismaService);
+      await prismaService.jobOffer.deleteMany({
+        where: {
+          id: {
+            in: [
+              searchJobOfferSeedData.jobOffer1.id,
+              searchJobOfferSeedData.jobOffer2.id,
+            ]
+          }
+        }
+      });
+      const result = await jobOfferRepository.findJobOffersByUserId(
+        searchJobOfferSeedData.talent.id,
+        { perPage: 1, page: 1 }
+      );
+      expect(result.total).toBe(0);
+      expect(result.data.length).toBe(0);
+    });
   });
 
   describe('findOneUnexpired', () => {
@@ -176,6 +195,30 @@ describe('JobOfferRepository', () => {
       });
       const result = await jobOfferRepository.findOneUnexpired(faker.string.uuid());
       expect(result).toBeNull();
+    });
+  });
+  describe('findOneById', () => {
+    it('Should find a jobOffer when it exists', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const jobOffer = await prismaService.jobOffer.create({
+        data: createTestJobOfferData({ userId: user.id })
+      });
+      const result = await jobOfferRepository.findOneById(jobOffer.id);
+      expect(result).not.toBeNull();
+      expect(result).toMatchObject(jobOffer);
+    });
+    it('Should not find a jobOffer when it does not exists', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const jobOffer = await prismaService.jobOffer.create({
+        data: createTestJobOfferData({ userId: user.id })
+      });
+      const result = await jobOfferRepository.findOneById(faker.string.uuid());
+      expect(result).toBeNull();
+    });
+    it('Should throw an exception when jobOfferId is not a valid uuid', async () => {
+      expect(jobOfferRepository.findOneById(faker.string.alphanumeric()))
+        .rejects
+        .toThrow();
     });
   });
 });

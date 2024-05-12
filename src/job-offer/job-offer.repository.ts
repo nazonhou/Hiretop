@@ -68,7 +68,7 @@ export class JobOfferRepository {
 
     const rawJobOffers = await this.prismaService.$queryRawUnsafe<Partial<RawJobOfferDto>[]>(query, userId, ...values);
     return {
-      total: rawJobOffers?.[0].total_count ?? 0,
+      total: rawJobOffers?.[0]?.total_count ?? 0,
       data: rawJobOffers.map(rawJobOffer => {
         delete rawJobOffer.total_count;
         return rawJobOffer;
@@ -116,6 +116,14 @@ export class JobOfferRepository {
       where: {
         id: jobOfferId,
         expiredAt: { gt: new Date() }
+      }
+    })
+  }
+
+  findOneById(jobOfferId: string) {
+    return this.prismaService.jobOffer.findUnique({
+      where: {
+        id: jobOfferId,
       }
     })
   }

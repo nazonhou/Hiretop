@@ -141,9 +141,11 @@ export function cleanTestDatabase(prismaClient: PrismaClient) {
   return prismaClient.$transaction([
     prismaClient.skill.deleteMany(),
     prismaClient.companyUser.deleteMany(),
-    prismaClient.jobOffer.deleteMany(),
     prismaClient.roleUser.deleteMany(),
     prismaClient.workExperience.deleteMany(),
+    prismaClient.applicationFeedback.deleteMany(),
+    prismaClient.jobInterview.deleteMany(),
+    prismaClient.jobApplication.deleteMany(),
     prismaClient.jobOffer.deleteMany(),
     prismaClient.company.deleteMany(),
     prismaClient.user.deleteMany()

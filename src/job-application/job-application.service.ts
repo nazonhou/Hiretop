@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JobApplicationRepository } from './job-application.repository';
 import { TokenPayload } from '@auth/auth.service';
 import { CreateJobApplicationDto } from './create-job-application.dto';
+import { PaginationDto } from '@src/pagination.dto';
 
 @Injectable()
 export class JobApplicationService {
@@ -14,6 +15,12 @@ export class JobApplicationService {
     };
     return this.jobApplicationRepository.createJobApplication(
       createJobApplicationDto
+    );
+  }
+
+  findApplicationsByJobOfferId(jobOfferId: string, paginationDto: PaginationDto) {
+    return this.jobApplicationRepository.findApplicationsByJobOfferId(
+      jobOfferId, paginationDto
     );
   }
 }
