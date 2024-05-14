@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@prisma-module/prisma.service";
 import { CreateCompanyDto } from "./create-company.dto";
+import { PaginationDto } from "@src/pagination.dto";
 
 @Injectable()
 export class CompanyRepository {
@@ -24,5 +25,18 @@ export class CompanyRepository {
 
   findOneById(id: string) {
     return this.prismaService.company.findUnique({ where: { id } });
+  }
+
+  findByNameStartsWith(startsWith: string, { page, perPage }: PaginationDto) {
+    return this.prismaService.company.findMany({
+      where: {
+        name: { startsWith }
+      },
+      orderBy: {
+        name: "asc"
+      },
+      skip: (page - 1) * perPage,
+      take: perPage
+    })
   }
 }

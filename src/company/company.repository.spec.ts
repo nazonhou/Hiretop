@@ -97,4 +97,41 @@ describe('CompanyRepository', () => {
     });
   });
 
+  describe("findByNameStartsWith", () => {
+    it('should not find any company when input does not match', async () => {
+      const company = await prismaService.company.create({
+        data:
+          { ...createTestCompanyDto(), name: 'Company_1' }
+      });
+      const result = await companyRepository.findByNameStartsWith('FAKE', { page: 1, perPage: 1 });
+      expect(result.length).toBe(0);
+    });
+    it('should find the companies with the right order', async () => {
+      await prismaService.company.createMany({
+        data: [
+          { ...createTestCompanyDto(), name: 'Company_2' },
+          { ...createTestCompanyDto(), name: 'Company_3' },
+          { ...createTestCompanyDto(), name: 'Company_1' },
+        ]
+      });
+      const result = await companyRepository.findByNameStartsWith('Company', { page: 1, perPage: 3 });
+      expect(result.length).toBe(3);
+      expect(result[0].name).toBe('Company_1');
+      expect(result[1].name).toBe('Company_2');
+      expect(result[2].name).toBe('Company_3');
+    });
+    it('should find the companies with the right order and right pagination', async () => {
+      await prismaService.company.createMany({
+        data: [
+          { ...createTestCompanyDto(), name: 'Company_2' },
+          { ...createTestCompanyDto(), name: 'Company_3' },
+          { ...createTestCompanyDto(), name: 'Company_1' },
+        ]
+      });
+      const result = await companyRepository.findByNameStartsWith('Company', { page: 2, perPage: 1 });
+      expect(result.length).toBe(1);
+      expect(result[0].name).toBe('Company_2');
+    });
+  });
+
 });
