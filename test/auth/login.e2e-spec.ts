@@ -152,7 +152,7 @@ describe('[POST] /auth/login (e2e)', () => {
       password: "$2a$04$s3ZDcxv/x6T4fSqmbztx7ufg/gvrdsvc1IaqAJJN9w8HjipdKIhnq"
     };
     const user: User
-      & { companyUser: CompanyUser }
+      & { companyUser: CompanyUser & { company: Company } }
       & { rolesUser: RoleUser[] } = {
       ...userWithoutDependencies,
       companyUser,
@@ -222,7 +222,16 @@ describe('[POST] /auth/login (e2e)', () => {
       expect(userRepositoryMock.findOneById.mock.calls[0][0]).toBe(user.id);
       expect(jwtService.verifyAsync(result.body['access_token'], { secret: jwtSecret }))
         .resolves
-        .toMatchObject({ sub: user.id, email: user.email })
+        .toMatchObject({
+          sub: user.id,
+          email: user.email,
+          roles: [rolesUser[0].role],
+          name: user.name,
+          company: {
+            id: company.id,
+            name: company.name
+          }
+        })
     });
   });
 })

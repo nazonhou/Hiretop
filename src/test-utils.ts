@@ -97,7 +97,8 @@ export function createAuthenticated(options?: {
   const payload: TokenPayload = {
     email: faker.internet.email(),
     sub: faker.string.uuid(),
-    roles: options?.roles ?? []
+    roles: options?.roles ?? [],
+    name: faker.person.fullName()
   };
   if (options?.company) {
     payload.company = options.company;

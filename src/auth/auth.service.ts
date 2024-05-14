@@ -11,7 +11,13 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async signIn(email: string, pass: string): Promise<{ access_token: string }> {
+  async signIn(
+    email: string,
+    pass: string
+  ): Promise<{
+    access_token: string,
+    payload: TokenPayload
+  }> {
     const presumedUser = await this.userService.findByEmail(email);
     if (!presumedUser || !await bcrypt.compare(pass, presumedUser.password)) {
       throw new UnauthorizedException();
@@ -21,7 +27,8 @@ export class AuthService {
     const payload: TokenPayload = {
       sub: user.id,
       email: user.email,
-      roles: user.rolesUser.map(roleUser => roleUser.role)
+      roles: user.rolesUser.map(roleUser => roleUser.role),
+      name: user.name
     };
     if (user.companyUser) {
       payload.company = {
@@ -32,6 +39,7 @@ export class AuthService {
 
     return {
       access_token: await this.jwtService.signAsync(payload),
+      payload
     };
   }
 }
@@ -40,5 +48,6 @@ export interface TokenPayload {
   sub: string;
   email: string;
   roles: Role[],
-  company?: { id: string, name: string }
+  company?: { id: string, name: string },
+  name: string
 }  
