@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from 'bcrypt';
-import { createTestCompanyDto, createTestJobOfferDto, createTestSkillDto, createTestUserDto } from "./test-utils";
+import { createTestCompanyDto, createTestJobOfferDto, createTestSkillDto, createTestUserDto, createTestWorkExperienceDto } from "./test-utils";
 import { faker } from "@faker-js/faker";
 const saltRounds = parseInt(process.env.HASH_SALT_ROUNDS);
 
@@ -139,6 +139,34 @@ export class TestingSearchJobApplication {
         })
       ]);
 
+      // create workExperience1-->(talent1), workExperience2-->(talent2), workExperience3-->(talent3)
+      const { companyId: workExperience1CompanyId, ...workExperience1Dto } = createTestWorkExperienceDto(company.id);
+      const { companyId: workExperience2CompanyId, ...workExperience2Dto } = createTestWorkExperienceDto(company.id);
+      const { companyId: workExperience3CompanyId, ...workExperience3Dto } = createTestWorkExperienceDto(company.id);
+      const [workExperience1, workExperience2, workExperience3] = await Promise.all([
+        tx.workExperience.create({
+          data: {
+            ...workExperience1Dto,
+            user: { connect: { id: talent1.id } },
+            company: { connect: { id: workExperience1CompanyId } }
+          }
+        }),
+        tx.workExperience.create({
+          data: {
+            ...workExperience2Dto,
+            user: { connect: { id: talent2.id } },
+            company: { connect: { id: workExperience2CompanyId } }
+          }
+        }),
+        tx.workExperience.create({
+          data: {
+            ...workExperience3Dto,
+            user: { connect: { id: talent3.id } },
+            company: { connect: { id: workExperience3CompanyId } }
+          }
+        })
+      ])
+
       return {
         company,
         talent1,
@@ -154,6 +182,9 @@ export class TestingSearchJobApplication {
         jobApplication1,
         jobApplication2,
         jobApplication3,
+        workExperience1,
+        workExperience2,
+        workExperience3,
       }
     });
   }

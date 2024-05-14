@@ -99,4 +99,23 @@ export class JobApplicationRepository {
       })
     }
   }
+
+  findOneJobApplication(jobApplicationId: string) {
+    return this.prismaService.jobApplication.findUnique({
+      where: { id: jobApplicationId },
+      include: {
+        applicant: {
+          include: {
+            skills: true,
+            workExperiences: {
+              include: { company: true },
+            }
+          }
+        },
+        jobOffer: {
+          include: { skills: true }
+        }
+      }
+    });
+  }
 }

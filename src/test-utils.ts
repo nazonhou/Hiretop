@@ -231,3 +231,21 @@ export function createTestJobApplication(): JobApplication {
 export function createTestingPrismaClient(datasourceUrl: string) {
   return new PrismaClient({ datasourceUrl });
 }
+
+export function createTestJobApplicationWithDetails() {
+  const skill = createTestSkill();
+  const applicant = {
+    ...createTestUser(),
+    workExperiences: [createTestWorkExperience()],
+    skills: [skill]
+  }
+  const jobOffer = { ...createTestJobOffer(), skills: [skill] };
+  
+  return {
+    ...createTestJobApplication(),
+    jobOfferId: jobOffer.id,
+    applicantId: applicant.id,
+    jobOffer,
+    applicant
+  };
+}

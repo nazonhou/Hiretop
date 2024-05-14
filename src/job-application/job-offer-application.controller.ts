@@ -34,4 +34,19 @@ export class JobOfferApplicationController {
       jobOfferId, paginationDto
     );
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':jobApplicationId')
+  @Roles(Role.COMPANY)
+  getOneJobApplication(
+    @Param('jobOfferId') jobOfferId: string,
+    @Param('jobApplicationId') jobApplicationId: string,
+    @Authenticated() user: TokenPayload
+  ) {
+    return this.jobApplicationService.findOneJobApplication({
+      jobApplicationId,
+      jobOfferId,
+      user
+    });
+  }
 }

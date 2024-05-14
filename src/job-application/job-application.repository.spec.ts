@@ -8,6 +8,7 @@ import { cleanTestDatabase, createTestingPrismaClient } from '@src/test-utils';
 import { generateDataToTestJobOfferSearching } from '@src/test-search-job-offer';
 import { JobApplicationStatus, PrismaClient } from '@prisma/client';
 import { TestingSearchJobApplication } from '@src/testing-search-job-application';
+import { faker } from '@faker-js/faker';
 
 describe('JobApplicationRepository', () => {
   let jobApplicationRepository: JobApplicationRepository;
@@ -107,6 +108,30 @@ describe('JobApplicationRepository', () => {
       );
       expect(result.total).toBe(0);
       expect(result.data.length).toBe(0);
+    });
+  });
+
+  describe('findOneJobApplication', () => {
+    it('Should throw an exception when jobApplicationId is not a uuid', async () => {
+      const result = jobApplicationRepository.findOneJobApplication(faker.lorem.word());
+      expect(result).rejects.toThrow();
+    });
+    it('Should not retrieve a jobApplication when id does not exists', async () => {
+      const result = await jobApplicationRepository.findOneJobApplication(faker.string.uuid());
+      expect(result).toBeNull();
+    });
+    it('Should retrieve a jobApplication', async () => {
+      const data = await new TestingSearchJobApplication(prismaService).generateData();
+      const result = await jobApplicationRepository.findOneJobApplication(data.jobApplication1.id);
+      expect(result).not.toBeNull();
+      expect(result.applicant).toMatchObject(data.talent1);
+      expect(result.applicant.skills.length).toBe(2);
+      expect(result.applicant.skills.every(({ id }) => id == data.skill1.id || id == data.skill2.id)).toBeTruthy();
+      expect(result.applicant.workExperiences.length).toBe(1);
+      expect(result.applicant.workExperiences[0]).toMatchObject(data.workExperience1);
+      expect(result.jobOffer).toMatchObject(data.jobOffer1);
+      expect(result.jobOffer.skills.length).toBe(2);
+      expect(result.jobOffer.skills.every(({ id }) => id == data.skill1.id || id == data.skill2.id)).toBeTruthy();
     });
   });
 });
