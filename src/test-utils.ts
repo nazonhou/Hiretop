@@ -1,6 +1,6 @@
 import { CreateTalentDto } from "@user/create-talent.dto";
 import { faker } from '@faker-js/faker';
-import { Company, CompanyCategory, JobApplication, JobApplicationStatus, JobOffer, JobType, LocationType, PrismaClient, Role, User, WorkExperience } from '@prisma/client';
+import { ApplicationFeedback, Company, CompanyCategory, JobApplication, JobApplicationStatus, JobOffer, JobType, LocationType, PrismaClient, Role, User, WorkExperience } from '@prisma/client';
 import { CreateCompanyDto } from "@company/create-company.dto";
 import { CreateCompanyUserDto } from "@user/create-company-user.dto";
 import { UpdateProfileDto } from "@user/update-profile-dto";
@@ -13,6 +13,7 @@ import { PrismaService } from "@prisma-module/prisma.service";
 import { CreateJobOfferDto } from "@job-offer/create-job-offer.dto";
 import { RawJobOfferDto } from "@job-offer/raw-job-offer.dto";
 import { SearchJobOfferDto } from "@job-offer/search-job-offer.dto";
+import { RejectJobApplicationDto } from "@job-application/reject-job-application.dto";
 
 export function createTestUserDto(): CreateTalentDto {
   const dto = new CreateTalentDto();
@@ -240,12 +241,27 @@ export function createTestJobApplicationWithDetails() {
     skills: [skill]
   }
   const jobOffer = { ...createTestJobOffer(), skills: [skill] };
-  
+
   return {
     ...createTestJobApplication(),
     jobOfferId: jobOffer.id,
     applicantId: applicant.id,
     jobOffer,
     applicant
+  };
+}
+
+export function createTestRejectJobApplicationDto(): RejectJobApplicationDto {
+  return {
+    message: faker.lorem.paragraph()
+  };
+}
+
+export function createTestApplicationFeedback(): ApplicationFeedback {
+  return {
+    id: faker.string.uuid(),
+    jobApplicationId: faker.string.uuid(),
+    message: faker.lorem.paragraph(),
+    sentAt: faker.date.recent()
   };
 }

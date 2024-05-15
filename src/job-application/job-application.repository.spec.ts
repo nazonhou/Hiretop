@@ -4,7 +4,7 @@ import { PrismaService } from '@prisma-module/prisma.service';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import * as util from "util";
 import { exec } from "child_process";
-import { cleanTestDatabase, createTestingPrismaClient } from '@src/test-utils';
+import { cleanTestDatabase, createTestRejectJobApplicationDto, createTestingPrismaClient } from '@src/test-utils';
 import { generateDataToTestJobOfferSearching } from '@src/test-search-job-offer';
 import { JobApplicationStatus, PrismaClient } from '@prisma/client';
 import { TestingSearchJobApplication } from '@src/testing-search-job-application';
@@ -132,6 +132,32 @@ describe('JobApplicationRepository', () => {
       expect(result.jobOffer).toMatchObject(data.jobOffer1);
       expect(result.jobOffer.skills.length).toBe(2);
       expect(result.jobOffer.skills.every(({ id }) => id == data.skill1.id || id == data.skill2.id)).toBeTruthy();
+    });
+  });
+
+  describe('rejectJobApplication', () => {
+    it('Should update jobApplication status to REJECTED and create a applicationFeedback', async () => {
+      const data = await new TestingSearchJobApplication(prismaService).generateData();
+      const rejectJobApplicationDto = createTestRejectJobApplicationDto();
+      await jobApplicationRepository.rejectJobApplication(data.jobApplication1.id, rejectJobApplicationDto);
+      const result = await prismaService.jobApplication.findUnique({
+        where: { id: data.jobApplication1.id },
+        include: { applicationFeedback: true }
+      });
+      expect(result.status).toBe(JobApplicationStatus.REJECTED);
+      expect(result.applicationFeedback).not.toBeNull();
+      expect(result.applicationFeedback.message).toBe(rejectJobApplicationDto.message);
+    });
+    it('Should throw an exception when jobApplicationId does not reference a jobApplication', async () => {
+      const data = await new TestingSearchJobApplication(prismaService).generateData();
+      const rejectJobApplicationDto = createTestRejectJobApplicationDto();
+      const result = jobApplicationRepository.rejectJobApplication(faker.string.uuid(), rejectJobApplicationDto);
+      expect(result).rejects.toThrow();
+    });
+    it('Should throw an exception when jobApplicationId is not a valid uuid', async () => {
+      const rejectJobApplicationDto = createTestRejectJobApplicationDto();
+      const result = jobApplicationRepository.rejectJobApplication(faker.string.alphanumeric(), rejectJobApplicationDto);
+      expect(result).rejects.toThrow();
     });
   });
 });

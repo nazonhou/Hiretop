@@ -4,6 +4,7 @@ import { TokenPayload } from '@auth/auth.service';
 import { CreateJobApplicationDto } from './create-job-application.dto';
 import { PaginationDto } from '@src/pagination.dto';
 import { FindOneJobApplicationDto } from './find-one-job-application.dto';
+import { RejectJobApplicationDto } from './reject-job-application.dto';
 
 @Injectable()
 export class JobApplicationService {
@@ -40,5 +41,12 @@ export class JobApplicationService {
     } catch (error) {
       throw new ForbiddenException();
     }
+  }
+
+  rejectJobApplication(jobApplicationId: string, rejectJobApplicationDto: RejectJobApplicationDto) {
+    return this.jobApplicationRepository.rejectJobApplication(
+      jobApplicationId,
+      rejectJobApplicationDto
+    );
   }
 }
