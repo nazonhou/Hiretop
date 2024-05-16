@@ -284,3 +284,20 @@ export function createTestAcceptJobApplicationDto(): AcceptJobApplicationDto {
     message: faker.lorem.text()
   };
 }
+
+export function createTestJobApplicationWithAllDetails() {
+  const jobApplication = createTestJobApplicationWithDetails();
+  const applicationFeedback: ApplicationFeedback = {
+    ...createTestApplicationFeedback(),
+    jobApplicationId: jobApplication.id
+  };
+  const jobInterview: JobInterview = {
+    ...createTestJobInterview(),
+    jobApplicationId: jobApplication.id
+  };
+  return {
+    ...jobApplication,
+    applicationFeedback,
+    jobInterview
+  };
+}

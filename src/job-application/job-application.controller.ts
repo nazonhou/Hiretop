@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Param, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Put, Query, UseGuards } from '@nestjs/common';
 import { JobApplicationService } from './job-application.service';
 import { ApplicationStatus } from './application-status.decorator';
 import { JobApplicationStatus, Role } from '@prisma/client';
@@ -7,6 +7,9 @@ import { ApplicationStatusGuard } from './application-status.guard';
 import { RejectJobApplicationDto } from './reject-job-application.dto';
 import { Roles } from '@auth/roles.decorator';
 import { AcceptJobApplicationDto } from './accept-job-application.dto';
+import { PaginationDto } from '@src/pagination.dto';
+import { Authenticated } from '@user/authenticated.decorator';
+import { TokenPayload } from '@auth/auth.service';
 
 @Controller('job-applications')
 export class JobApplicationController {
@@ -40,4 +43,15 @@ export class JobApplicationController {
       acceptJobApplicationDto
     );
   }
+
+  @Get()
+  findJobApplications(
+    @Query() paginationDto: PaginationDto,
+    @Authenticated() user: TokenPayload
+  ) {
+    return this.jobApplicationService.findApplicationsByApplicantId(
+      user, paginationDto
+    );
+  }
 }
+

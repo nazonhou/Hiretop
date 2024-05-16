@@ -13,6 +13,7 @@ import { IsCompanyIdConstraint } from './company-id-constraint';
 import { SkillModule } from '@skill/skill.module';
 import { JobInterviewModule } from '@job-interview/job-interview.module';
 import { JobInterviewTimeConstraint } from './job-interview-time-constraint';
+import { JobApplicationModule } from '@job-application/job-application.module';
 
 
 @Module({
@@ -30,7 +31,7 @@ import { JobInterviewTimeConstraint } from './job-interview-time-constraint';
     IsCompanyIdConstraint,
     JobInterviewTimeConstraint
   ],
-  imports: [UserModule, CompanyModule, SkillModule, JobInterviewModule]
+  imports: [UserModule, CompanyModule, SkillModule, JobInterviewModule, JobApplicationModule]
 })
 export class ValidationModule {}
 

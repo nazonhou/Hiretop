@@ -8,6 +8,7 @@ import { JobApplicationController } from './job-application.controller';
 @Module({
   providers: [JobApplicationRepository, JobApplicationService],
   controllers: [JobOfferApplicationController, JobApplicationController],
-  imports: [JobOfferModule]
+  imports: [JobOfferModule],
+  exports: [JobApplicationRepository]
 })
 export class JobApplicationModule {}

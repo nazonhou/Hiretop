@@ -166,4 +166,26 @@ export class JobApplicationRepository {
       }
     });
   }
+
+  findApplicationsByApplicantId(
+    applicantId: string,
+    { page, perPage }: PaginationDto
+  ) {
+    return Promise.all([
+      this.prismaService.jobApplication.findMany({
+        where: { applicantId },
+        include: {
+          applicationFeedback: true,
+          jobInterview: true,
+          jobOffer: { include: { company: true, skills: true } }
+        },
+        orderBy: { appliedAt: 'desc' },
+        skip: (page - 1) * perPage,
+        take: perPage
+      }),
+      this.prismaService.jobApplication.count({
+        where: { applicantId }
+      })
+    ]);
+  }
 }

@@ -10,6 +10,7 @@ import { JobApplicationStatus, PrismaClient } from '@prisma/client';
 import { TestingSearchJobApplication } from '@src/testing-search-job-application';
 import { faker } from '@faker-js/faker';
 import { AcceptJobApplicationDto } from './accept-job-application.dto';
+import { TestingUserFindJobApplicationsSeed } from '@src/testing-user-find-job-applications.seed';
 
 describe('JobApplicationRepository', () => {
   let jobApplicationRepository: JobApplicationRepository;
@@ -196,6 +197,47 @@ describe('JobApplicationRepository', () => {
       expect(result.jobInterview).not.toBeNull();
       expect(result.jobInterview.startedAt).toMatchObject(startedAt);
       expect(result.jobInterview.endedAt).toMatchObject(endedAt);
+    });
+  });
+
+  describe('findApplicationsByApplicantId', () => {
+    it('Should find jobApplications', async () => {
+      const data = await (new TestingUserFindJobApplicationsSeed(prismaService)).generateData();
+      const result = await jobApplicationRepository.findApplicationsByApplicantId(
+        data.talent.id, { page: 1, perPage: 3 }
+      );
+      expect(result[0].length).toBe(3);
+      expect(result[0].every(
+        application => [
+          data.jobApplication1.id,
+          data.jobApplication2.id,
+          data.jobApplication3.id
+        ].includes(application.id)
+      )).toBeTruthy();
+      expect(result[1]).toBe(3);
+    });
+    it('Should find jobApplications paginated', async () => {
+      const data = await (new TestingUserFindJobApplicationsSeed(prismaService)).generateData();
+      const result = await jobApplicationRepository.findApplicationsByApplicantId(
+        data.talent.id, { page: 2, perPage: 1 }
+      );
+      expect(result[0].length).toBe(1);
+      expect(result[0].every(
+        application => [
+          data.jobApplication1.id,
+          data.jobApplication2.id,
+          data.jobApplication3.id
+        ].includes(application.id)
+      )).toBeTruthy();
+      expect(result[1]).toBe(3);
+    });
+    it('Should not find jobApplications when applicantId does not match', async () => {
+      const data = await (new TestingUserFindJobApplicationsSeed(prismaService)).generateData();
+      const result = await jobApplicationRepository.findApplicationsByApplicantId(
+        faker.string.uuid(), { page: 1, perPage: 3 }
+      );
+      expect(result[0].length).toBe(0);
+      expect(result[1]).toBe(0);
     });
   });
 });

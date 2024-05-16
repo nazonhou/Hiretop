@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JobApplicationRepository } from './job-application.repository';
 import { TokenPayload } from '@auth/auth.service';
 import { CreateJobApplicationDto } from './create-job-application.dto';
@@ -61,5 +61,14 @@ export class JobApplicationService {
     return this.jobApplicationRepository.acceptJobApplication(
       jobApplicationId, acceptJobApplicationDto
     );
+  }
+
+  async findApplicationsByApplicantId(
+    user: TokenPayload, paginationDto: PaginationDto
+  ) {
+    const [data, total] = await this.jobApplicationRepository.findApplicationsByApplicantId(
+      user.sub, paginationDto
+    );
+    return { data, total };
   }
 }
