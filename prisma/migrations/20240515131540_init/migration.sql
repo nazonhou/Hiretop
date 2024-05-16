@@ -105,6 +105,8 @@ CREATE TABLE "job_applications" (
 CREATE TABLE "job_interviews" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "job_application_id" UUID NOT NULL,
+    "started_at" TIMESTAMP(3) NOT NULL,
+    "ended_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "job_interviews_pkey" PRIMARY KEY ("id")
 );

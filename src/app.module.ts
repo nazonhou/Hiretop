@@ -12,6 +12,7 @@ import { SkillModule } from './skill/skill.module';
 import { WorkExperienceModule } from './work-experience/work-experience.module';
 import { JobOfferModule } from './job-offer/job-offer.module';
 import { JobApplicationModule } from './job-application/job-application.module';
+import { JobInterviewModule } from './job-interview/job-interview.module';
 import jwtConfig from '@config/jwt.config';
 import hashConfig from '@config/hash.config';
 
@@ -31,6 +32,7 @@ import hashConfig from '@config/hash.config';
     WorkExperienceModule,
     JobOfferModule,
     JobApplicationModule,
+    JobInterviewModule,
   ],
   controllers: [AppController],
   providers: [AppService],

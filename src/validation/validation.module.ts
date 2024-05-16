@@ -11,6 +11,8 @@ import { IsSkillNameAlreadyExistConstraint } from './skill-name-constraint';
 import { ArraySkillConstraint } from './array-skills-constraint';
 import { IsCompanyIdConstraint } from './company-id-constraint';
 import { SkillModule } from '@skill/skill.module';
+import { JobInterviewModule } from '@job-interview/job-interview.module';
+import { JobInterviewTimeConstraint } from './job-interview-time-constraint';
 
 
 @Module({
@@ -25,9 +27,10 @@ import { SkillModule } from '@skill/skill.module';
     IsCompanyNameAlreadyExistConstraint,
     IsSkillNameAlreadyExistConstraint,
     ArraySkillConstraint,
-    IsCompanyIdConstraint
+    IsCompanyIdConstraint,
+    JobInterviewTimeConstraint
   ],
-  imports: [UserModule, CompanyModule, SkillModule]
+  imports: [UserModule, CompanyModule, SkillModule, JobInterviewModule]
 })
 export class ValidationModule {}
 

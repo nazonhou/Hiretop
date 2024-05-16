@@ -9,6 +9,7 @@ import { generateDataToTestJobOfferSearching } from '@src/test-search-job-offer'
 import { JobApplicationStatus, PrismaClient } from '@prisma/client';
 import { TestingSearchJobApplication } from '@src/testing-search-job-application';
 import { faker } from '@faker-js/faker';
+import { AcceptJobApplicationDto } from './accept-job-application.dto';
 
 describe('JobApplicationRepository', () => {
   let jobApplicationRepository: JobApplicationRepository;
@@ -149,7 +150,6 @@ describe('JobApplicationRepository', () => {
       expect(result.applicationFeedback.message).toBe(rejectJobApplicationDto.message);
     });
     it('Should throw an exception when jobApplicationId does not reference a jobApplication', async () => {
-      const data = await new TestingSearchJobApplication(prismaService).generateData();
       const rejectJobApplicationDto = createTestRejectJobApplicationDto();
       const result = jobApplicationRepository.rejectJobApplication(faker.string.uuid(), rejectJobApplicationDto);
       expect(result).rejects.toThrow();
@@ -158,6 +158,44 @@ describe('JobApplicationRepository', () => {
       const rejectJobApplicationDto = createTestRejectJobApplicationDto();
       const result = jobApplicationRepository.rejectJobApplication(faker.string.alphanumeric(), rejectJobApplicationDto);
       expect(result).rejects.toThrow();
+    });
+  });
+
+  describe('acceptJobApplication', () => {
+    it('Should throw an exception when jobApplicationId is not a valid uuid', async () => {
+      const acceptJobApplicationDto: AcceptJobApplicationDto = {
+        endedAt: faker.date.anytime(),
+        startedAt: faker.date.anytime(),
+        message: faker.lorem.paragraph()
+      };
+      const result = jobApplicationRepository.acceptJobApplication(faker.lorem.word(), acceptJobApplicationDto);
+      expect(result).rejects.toThrow();
+    });
+    it('Should throw an exception when jobApplicationId does not a reference a jobApplication', async () => {
+      const acceptJobApplicationDto: AcceptJobApplicationDto = {
+        endedAt: faker.date.anytime(),
+        startedAt: faker.date.anytime(),
+        message: faker.lorem.paragraph()
+      };
+      const result = jobApplicationRepository.acceptJobApplication(faker.string.uuid(), acceptJobApplicationDto);
+      expect(result).rejects.toThrow();
+    });
+    it('Should update jobApplication status, create jobInterview and applicationFeedback', async () => {
+      const data = await new TestingSearchJobApplication(prismaService).generateData();
+      const startedAt = faker.date.soon();
+      const endedAt = faker.date.soon({ refDate: startedAt });
+      const acceptJobApplicationDto: AcceptJobApplicationDto = {
+        startedAt,
+        endedAt,
+        message: faker.lorem.paragraph()
+      };
+      const result = await jobApplicationRepository.acceptJobApplication(data.jobApplication1.id, acceptJobApplicationDto);
+      expect(result.status).toBe(JobApplicationStatus.ACCEPTED);
+      expect(result.applicationFeedback).not.toBeNull();
+      expect(result.applicationFeedback.message).toBe(acceptJobApplicationDto.message);
+      expect(result.jobInterview).not.toBeNull();
+      expect(result.jobInterview.startedAt).toMatchObject(startedAt);
+      expect(result.jobInterview.endedAt).toMatchObject(endedAt);
     });
   });
 });

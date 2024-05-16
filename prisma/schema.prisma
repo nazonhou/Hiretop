@@ -165,6 +165,8 @@ model JobInterview {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id])
   jobApplicationId String         @unique @map("job_application_id") @db.Uuid
+  startedAt        DateTime       @map("started_at")
+  endedAt          DateTime       @map("ended_at")
 
   @@map("job_interviews")
 }

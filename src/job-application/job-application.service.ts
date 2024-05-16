@@ -5,6 +5,7 @@ import { CreateJobApplicationDto } from './create-job-application.dto';
 import { PaginationDto } from '@src/pagination.dto';
 import { FindOneJobApplicationDto } from './find-one-job-application.dto';
 import { RejectJobApplicationDto } from './reject-job-application.dto';
+import { AcceptJobApplicationDto } from './accept-job-application.dto';
 
 @Injectable()
 export class JobApplicationService {
@@ -43,10 +44,22 @@ export class JobApplicationService {
     }
   }
 
-  rejectJobApplication(jobApplicationId: string, rejectJobApplicationDto: RejectJobApplicationDto) {
+  rejectJobApplication(
+    jobApplicationId: string,
+    rejectJobApplicationDto: RejectJobApplicationDto
+  ) {
     return this.jobApplicationRepository.rejectJobApplication(
       jobApplicationId,
       rejectJobApplicationDto
+    );
+  }
+
+  acceptJobApplication(
+    jobApplicationId: string,
+    acceptJobApplicationDto: AcceptJobApplicationDto
+  ) {
+    return this.jobApplicationRepository.acceptJobApplication(
+      jobApplicationId, acceptJobApplicationDto
     );
   }
 }

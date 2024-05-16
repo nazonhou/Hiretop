@@ -6,6 +6,7 @@ import { RawJobApplicationDto } from './raw-job-application.dto';
 import { JobApplicationDto } from './job-application.dto';
 import { RejectJobApplicationDto } from './reject-job-application.dto';
 import { JobApplicationStatus } from '@prisma/client';
+import { AcceptJobApplicationDto } from './accept-job-application.dto';
 
 @Injectable()
 export class JobApplicationRepository {
@@ -136,6 +137,33 @@ export class JobApplicationRepository {
         }
       },
       include: { applicationFeedback: true }
+    });
+  }
+
+  acceptJobApplication(
+    jobApplicationId: string,
+    acceptJobApplicationDto: AcceptJobApplicationDto
+  ) {
+    return this.prismaService.jobApplication.update({
+      where: { id: jobApplicationId },
+      data: {
+        status: JobApplicationStatus.ACCEPTED,
+        applicationFeedback: {
+          create: {
+            message: acceptJobApplicationDto.message
+          }
+        },
+        jobInterview: {
+          create: {
+            endedAt: acceptJobApplicationDto.endedAt,
+            startedAt: acceptJobApplicationDto.startedAt
+          }
+        }
+      },
+      include: {
+        applicationFeedback: true,
+        jobInterview: true
+      }
     });
   }
 }

@@ -10,7 +10,8 @@ export class RequestInterceptor implements NestInterceptor {
     request.body['injected'] = {
       params: request.params,
       query: request.query,
-      user: request['user']
+      user: request['user'],
+      jobApplication: request['jobApplication']
     };
     return next.handle();
   }

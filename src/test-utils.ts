@@ -1,6 +1,6 @@
 import { CreateTalentDto } from "@user/create-talent.dto";
 import { faker } from '@faker-js/faker';
-import { ApplicationFeedback, Company, CompanyCategory, JobApplication, JobApplicationStatus, JobOffer, JobType, LocationType, PrismaClient, Role, User, WorkExperience } from '@prisma/client';
+import { ApplicationFeedback, Company, CompanyCategory, JobApplication, JobApplicationStatus, JobInterview, JobOffer, JobType, LocationType, PrismaClient, Role, User, WorkExperience } from '@prisma/client';
 import { CreateCompanyDto } from "@company/create-company.dto";
 import { CreateCompanyUserDto } from "@user/create-company-user.dto";
 import { UpdateProfileDto } from "@user/update-profile-dto";
@@ -14,6 +14,7 @@ import { CreateJobOfferDto } from "@job-offer/create-job-offer.dto";
 import { RawJobOfferDto } from "@job-offer/raw-job-offer.dto";
 import { SearchJobOfferDto } from "@job-offer/search-job-offer.dto";
 import { RejectJobApplicationDto } from "@job-application/reject-job-application.dto";
+import { AcceptJobApplicationDto } from "@job-application/accept-job-application.dto";
 
 export function createTestUserDto(): CreateTalentDto {
   const dto = new CreateTalentDto();
@@ -263,5 +264,23 @@ export function createTestApplicationFeedback(): ApplicationFeedback {
     jobApplicationId: faker.string.uuid(),
     message: faker.lorem.paragraph(),
     sentAt: faker.date.recent()
+  };
+}
+
+export function createTestJobInterview(): JobInterview {
+  return {
+    id: faker.string.uuid(),
+    jobApplicationId: faker.string.uuid(),
+    startedAt: faker.date.recent(),
+    endedAt: faker.date.soon()
+  };
+}
+
+export function createTestAcceptJobApplicationDto(): AcceptJobApplicationDto {
+  const startedAt = faker.date.soon();
+  return {
+    startedAt,
+    endedAt: new Date(startedAt.getTime() + 2 * 60 * 60 * 1000),
+    message: faker.lorem.text()
   };
 }

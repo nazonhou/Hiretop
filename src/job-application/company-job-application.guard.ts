@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JobApplicationRepository } from './job-application.repository';
 import { TokenPayload } from '@auth/auth.service';
-import { JobApplicationStatus } from '@prisma/client';
+import { JobApplication, JobApplicationStatus } from '@prisma/client';
 
 @Injectable()
 export class CompanyJobApplicationGuard implements CanActivate {
@@ -13,11 +13,12 @@ export class CompanyJobApplicationGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<{
       params: { jobApplicationId: string },
       user?: TokenPayload,
-      jobApplicationStatus?: JobApplicationStatus
+      jobApplicationStatus?: JobApplicationStatus,
+      jobApplication?: JobApplication
     }>();
 
     const { params, user } = request;
-    
+
     if (!user?.company?.id) {
       return false;
     }
@@ -32,6 +33,7 @@ export class CompanyJobApplicationGuard implements CanActivate {
       }
 
       request.jobApplicationStatus = jobApplication.status;
+      request.jobApplication = jobApplication;
       return true;
     } catch (error) {
       return false;

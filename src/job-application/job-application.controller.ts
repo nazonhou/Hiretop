@@ -6,6 +6,7 @@ import { CompanyJobApplicationGuard } from './company-job-application.guard';
 import { ApplicationStatusGuard } from './application-status.guard';
 import { RejectJobApplicationDto } from './reject-job-application.dto';
 import { Roles } from '@auth/roles.decorator';
+import { AcceptJobApplicationDto } from './accept-job-application.dto';
 
 @Controller('job-applications')
 export class JobApplicationController {
@@ -22,5 +23,21 @@ export class JobApplicationController {
     @Body() rejectJobApplicationDto: RejectJobApplicationDto
   ) {
     return this.jobApplicationService.rejectJobApplication(jobApplicationId, rejectJobApplicationDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApplicationStatus(JobApplicationStatus.TO_ASSESS)
+  @UseGuards(ApplicationStatusGuard)
+  @UseGuards(CompanyJobApplicationGuard)
+  @Roles(Role.COMPANY)
+  @Put(':jobApplicationId/accepted')
+  accept(
+    @Param('jobApplicationId') jobApplicationId: string,
+    @Body() acceptJobApplicationDto: AcceptJobApplicationDto
+  ) {
+    return this.jobApplicationService.acceptJobApplication(
+      jobApplicationId,
+      acceptJobApplicationDto
+    );
   }
 }
