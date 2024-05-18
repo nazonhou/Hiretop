@@ -7,6 +7,7 @@ import { Roles } from '@auth/roles.decorator';
 import { Role } from '@prisma/client';
 import { LinkedCompany } from '@auth/linked-company.decorator';
 import { SearchJobOfferDto } from './search-job-offer.dto';
+import { GetJobOfferStatisticsDto } from './get-job-offer-statistics.dto';
 
 @Controller('job-offers')
 export class JobOfferController {
@@ -28,5 +29,15 @@ export class JobOfferController {
     @Authenticated() user: TokenPayload
   ) {
     return this.jobOfferService.searchJobOffers(user, searchJobOfferDto);
+  }
+
+  @Get('statistics')
+  @Roles(Role.COMPANY)
+  @LinkedCompany()
+  getJobOffersStatistics(
+    @Query() getJobOfferStatisticsDto: GetJobOfferStatisticsDto,
+    @Authenticated() user: TokenPayload
+  ) {
+    return this.jobOfferService.getJobOffersStatistics(user, getJobOfferStatisticsDto);
   }
 }

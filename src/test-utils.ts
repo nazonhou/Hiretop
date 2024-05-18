@@ -15,6 +15,7 @@ import { RawJobOfferDto } from "@job-offer/raw-job-offer.dto";
 import { SearchJobOfferDto } from "@job-offer/search-job-offer.dto";
 import { RejectJobApplicationDto } from "@job-application/reject-job-application.dto";
 import { AcceptJobApplicationDto } from "@job-application/accept-job-application.dto";
+import { GetJobOfferStatisticsDto } from "@job-offer/get-job-offer-statistics.dto";
 
 export function createTestUserDto(): CreateTalentDto {
   const dto = new CreateTalentDto();
@@ -299,5 +300,14 @@ export function createTestJobApplicationWithAllDetails() {
     ...jobApplication,
     applicationFeedback,
     jobInterview
+  };
+}
+
+export function createTestGetJobOfferStatisticsDto(): GetJobOfferStatisticsDto {
+  return {
+    start: faker.date.recent(),
+    end: faker.date.soon(),
+    jobType: faker.helpers.enumValue(JobType),
+    locationType: faker.helpers.enumValue(LocationType)
   };
 }

@@ -4,6 +4,8 @@ import { CreateJobOfferDto } from "./create-job-offer.dto";
 import { SearchJobOfferDto } from "./search-job-offer.dto";
 import { JobOfferDto } from "./job-offer.dto";
 import { RawJobOfferDto } from "./raw-job-offer.dto";
+import { GetJobOfferStatisticsDto } from "./get-job-offer-statistics.dto";
+import { JobApplicationStatus } from "@prisma/client";
 
 @Injectable()
 export class JobOfferRepository {
@@ -126,5 +128,37 @@ export class JobOfferRepository {
         id: jobOfferId,
       }
     })
+  }
+
+  getJobOffersStatistics(companyId: string, getJobOfferStatisticsDto: GetJobOfferStatisticsDto) {
+    let query = '';
+    query += 'select ';
+    query += '  ja.status, ';
+    query += '  count(ja.status)::int as total ';
+    query += 'from ';
+    query += '  job_offers jo ';
+    query += 'join job_applications ja ';
+    query += '  on ';
+    query += '  ja.job_offer_id = jo.id ';
+    query += 'where ';
+    query += '  jo.posted_at between $1 and $2 ';
+    query += '  and jo.company_id = $3::uuid ';
+
+    const values: (Date | string)[] = [getJobOfferStatisticsDto.start, getJobOfferStatisticsDto.end, companyId];
+
+    if (getJobOfferStatisticsDto.jobType) {
+      values.push(getJobOfferStatisticsDto.jobType);
+      query += `  and jo."type" = $${values.length}::"JobType" `;
+    }
+
+    if (getJobOfferStatisticsDto.locationType) {
+      values.push(getJobOfferStatisticsDto.locationType);
+      query += `  and jo.location_type = $${values.length}::"LocationType" `;
+    }
+
+    query += 'group by ';
+    query += '  ja.status ';
+
+    return this.prismaService.$queryRawUnsafe<{ status: JobApplicationStatus, total: number }[]>(query, ...values);
   }
 }

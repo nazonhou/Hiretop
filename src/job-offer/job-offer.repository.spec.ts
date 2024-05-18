@@ -9,6 +9,8 @@ import { generateDataToTestJobOfferSearching } from '@src/test-search-job-offer'
 import { SearchJobOfferDto } from './search-job-offer.dto';
 import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
+import { TestingStatisticSeed } from '@src/testing-statistic.seed';
+import { GetJobOfferStatisticsDto } from './get-job-offer-statistics.dto';
 
 describe('JobOfferRepository', () => {
   let jobOfferRepository: JobOfferRepository;
@@ -219,6 +221,110 @@ describe('JobOfferRepository', () => {
       expect(jobOfferRepository.findOneById(faker.string.alphanumeric()))
         .rejects
         .toThrow();
+    });
+  });
+
+  describe('getJobOffersStatistics', () => {
+    it('Should return jobOffer1 statistics', async () => {
+      const data = await new TestingStatisticSeed(prismaService).generateData();
+      const getJobOfferStatisticsDto: GetJobOfferStatisticsDto = {
+        start: new Date(data.jobOffer1.postedAt.getTime() - 1000),
+        end: new Date(data.jobOffer1.postedAt.getTime() + 1000),
+      }
+      const result = await jobOfferRepository.getJobOffersStatistics(data.company.id, getJobOfferStatisticsDto);
+      expect(result.length).toBe(2);
+      expect(result.find(({ status, total }) => status == 'ACCEPTED' && total == 1)).toBeDefined();
+      expect(result.find(({ status, total }) => status == 'REJECTED' && total == 1)).toBeDefined();
+      expect(result.find(({ status }) => status == 'TO_ASSESS')).toBeUndefined();
+    });
+    it('Should return jobOffer2 statistics', async () => {
+      const data = await new TestingStatisticSeed(prismaService).generateData();
+      const getJobOfferStatisticsDto: GetJobOfferStatisticsDto = {
+        start: new Date(data.jobOffer2.postedAt.getTime() - 1000),
+        end: new Date(data.jobOffer2.postedAt.getTime() + 1000),
+      }
+      const result = await jobOfferRepository.getJobOffersStatistics(data.company.id, getJobOfferStatisticsDto);
+      expect(result.length).toBe(2);
+      expect(result.find(({ status, total }) => status == 'ACCEPTED' && total == 1)).toBeDefined();
+      expect(result.find(({ status, total }) => status == 'REJECTED' && total == 1)).toBeDefined();
+      expect(result.find(({ status }) => status == 'TO_ASSESS')).toBeUndefined();
+    });
+    it('Should return jobOffer3 statistics', async () => {
+      const data = await new TestingStatisticSeed(prismaService).generateData();
+      const getJobOfferStatisticsDto: GetJobOfferStatisticsDto = {
+        start: new Date(data.jobOffer3.postedAt.getTime() - 1000),
+        end: new Date(data.jobOffer3.postedAt.getTime() + 1000),
+      }
+      const result = await jobOfferRepository.getJobOffersStatistics(data.company.id, getJobOfferStatisticsDto);
+      expect(result.length).toBe(1);
+      expect(result.find(({ status }) => status == 'ACCEPTED')).toBeUndefined();
+      expect(result.find(({ status }) => status == 'REJECTED')).toBeUndefined();
+      expect(result.find(({ status, total }) => status == 'TO_ASSESS' && total == 2)).toBeDefined();
+    });
+    it('Should return all jobOffers statistics', async () => {
+      const data = await new TestingStatisticSeed(prismaService).generateData();
+      const getJobOfferStatisticsDto: GetJobOfferStatisticsDto = {
+        start: faker.date.past(),
+        end: faker.date.future(),
+      }
+      const result = await jobOfferRepository.getJobOffersStatistics(data.company.id, getJobOfferStatisticsDto);
+      expect(result.length).toBe(3);
+      expect(result.find(({ status, total }) => status == 'ACCEPTED' && total == 2)).toBeDefined();
+      expect(result.find(({ status, total }) => status == 'REJECTED' && total == 2)).toBeDefined();
+      expect(result.find(({ status, total }) => status == 'TO_ASSESS' && total == 2)).toBeDefined();
+    });
+    it('Should return 0 jobOffer statistics', async () => {
+      const data = await new TestingStatisticSeed(prismaService).generateData();
+      const start = faker.date.past();
+      const getJobOfferStatisticsDto: GetJobOfferStatisticsDto = {
+        start,
+        end: new Date(start.getTime() + 1000),
+      }
+      const result = await jobOfferRepository.getJobOffersStatistics(data.company.id, getJobOfferStatisticsDto);
+      expect(result.length).toBe(0);
+    });
+    it('Should return statistics with jobType filter', async () => {
+      const data = await new TestingStatisticSeed(prismaService).generateData();
+      const getJobOfferStatisticsDto: GetJobOfferStatisticsDto = {
+        start: faker.date.past(),
+        end: faker.date.future(),
+        jobType: data.jobOffer1.type
+      }
+      const result = await jobOfferRepository.getJobOffersStatistics(data.company.id, getJobOfferStatisticsDto);
+      expect(result.find(({ status, total }) => status == 'ACCEPTED' && total >= 1)).toBeDefined();
+      expect(result.find(({ status, total }) => status == 'REJECTED' && total >= 1)).toBeDefined();
+    });
+    it('Should return statistics with locationType filter', async () => {
+      const data = await new TestingStatisticSeed(prismaService).generateData();
+      const getJobOfferStatisticsDto: GetJobOfferStatisticsDto = {
+        start: faker.date.past(),
+        end: faker.date.future(),
+        locationType: data.jobOffer1.locationType
+      }
+      const result = await jobOfferRepository.getJobOffersStatistics(data.company.id, getJobOfferStatisticsDto);
+      expect(result.find(({ status, total }) => status == 'ACCEPTED' && total >= 1)).toBeDefined();
+      expect(result.find(({ status, total }) => status == 'REJECTED' && total >= 1)).toBeDefined();
+    });
+    it('Should return statistics with all filters', async () => {
+      const data = await new TestingStatisticSeed(prismaService).generateData();
+      const getJobOfferStatisticsDto: GetJobOfferStatisticsDto = {
+        start: faker.date.past(),
+        end: faker.date.future(),
+        jobType: data.jobOffer1.type,
+        locationType: data.jobOffer1.locationType
+      }
+      const result = await jobOfferRepository.getJobOffersStatistics(data.company.id, getJobOfferStatisticsDto);
+      expect(result.find(({ status, total }) => status == 'ACCEPTED' && total >= 1)).toBeDefined();
+      expect(result.find(({ status, total }) => status == 'REJECTED' && total >= 1)).toBeDefined();
+    });
+    it('Should return 0 jobOffer statistics when companyId is not the same', async () => {
+      await new TestingStatisticSeed(prismaService).generateData();
+      const getJobOfferStatisticsDto: GetJobOfferStatisticsDto = {
+        start: faker.date.past(),
+        end: faker.date.future(),
+      }
+      const result = await jobOfferRepository.getJobOffersStatistics(faker.string.uuid(), getJobOfferStatisticsDto);
+      expect(result.length).toBe(0);
     });
   });
 });
