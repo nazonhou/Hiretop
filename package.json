@@ -21,7 +21,8 @@
     "test:spec": "jest --config ./jest-spec.config.js --runInBand",
     "db:seed:search-job-offers": "ts-node prisma/search-job-offers.seed.ts",
     "db:seed:search-job-applications": "ts-node prisma/search-job-applications.seed.ts",
-    "db:seed:statistics": "ts-node prisma/statistics.seed.ts"
+    "db:seed:statistics": "ts-node prisma/statistics.seed.ts",
+    "vercel-build": "prisma generate && prisma migrate deploy && nest build"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.8",
