@@ -7,6 +7,9 @@ import { Public } from './public.decorator';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  /**
+   * Get a jwt token
+   */
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')

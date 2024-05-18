@@ -10,6 +10,9 @@ import { UpdateSkillsDto } from './update-skills.dto';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  /**
+   * Update user profile
+   */
   @Put('profile')
   @HttpCode(HttpStatus.OK)
   updateProfile(
@@ -19,6 +22,9 @@ export class UserController {
     return this.userService.updateUserProfile(user, updateProfileDto);
   }
 
+  /**
+   * Create a new skill
+   */
   @Post('skills')
   @HttpCode(HttpStatus.CREATED)
   createSkill(
@@ -28,6 +34,9 @@ export class UserController {
     return this.userService.createSkill(user, createSkillDto);
   }
 
+  /**
+   * Update user skills
+   */
   @Put('skills')
   @HttpCode(HttpStatus.OK)
   updateSkills(
@@ -37,6 +46,9 @@ export class UserController {
     return this.userService.updateSkills(user, updateSkillsDto);
   }
 
+  /**
+   * Get user skills
+   */
   @Get('skills')
   @HttpCode(HttpStatus.OK)
   getSkills(

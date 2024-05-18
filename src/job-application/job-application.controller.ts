@@ -15,6 +15,9 @@ import { TokenPayload } from '@auth/auth.service';
 export class JobApplicationController {
   constructor(private jobApplicationService: JobApplicationService) {}
 
+  /**
+   * Reject a job application
+   */
   @HttpCode(HttpStatus.OK)
   @ApplicationStatus(JobApplicationStatus.TO_ASSESS)
   @UseGuards(ApplicationStatusGuard)
@@ -28,6 +31,9 @@ export class JobApplicationController {
     return this.jobApplicationService.rejectJobApplication(jobApplicationId, rejectJobApplicationDto);
   }
 
+  /**
+   * Accept a job application
+   */
   @HttpCode(HttpStatus.OK)
   @ApplicationStatus(JobApplicationStatus.TO_ASSESS)
   @UseGuards(ApplicationStatusGuard)
@@ -44,6 +50,9 @@ export class JobApplicationController {
     );
   }
 
+  /**
+   * Get a paged list of job applications of the current user
+   */
   @Get()
   findJobApplications(
     @Query() paginationDto: PaginationDto,

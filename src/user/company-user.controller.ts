@@ -7,6 +7,9 @@ import { UserService } from './user.service';
 export class CompanyUserController {
   constructor(private userService: UserService) {}
 
+  /**
+   * Self-registration as company member
+   */
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post()

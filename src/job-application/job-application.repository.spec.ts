@@ -216,7 +216,7 @@ describe('JobApplicationRepository', () => {
       )).toBeTruthy();
       expect(result[1]).toBe(3);
     });
-    it('Should find jobApplications paginated', async () => {
+    it('Should find jobApplications paged', async () => {
       const data = await (new TestingUserFindJobApplicationsSeed(prismaService)).generateData();
       const result = await jobApplicationRepository.findApplicationsByApplicantId(
         data.talent.id, { page: 2, perPage: 1 }

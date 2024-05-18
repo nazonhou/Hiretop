@@ -8,6 +8,9 @@ import { WorkExperienceService } from './work-experience.service';
 export class WorkExperienceController {
   constructor(private workExperienceService: WorkExperienceService) {}
 
+  /**
+   * Create a work experience
+   */
   @Post()
   @HttpCode(HttpStatus.CREATED)
   registerWorkExperience(

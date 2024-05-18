@@ -1,4 +1,4 @@
-import { OmitType } from "@nestjs/mapped-types";
+import { OmitType } from "@nestjs/swagger";
 import { CreateTalentDto } from "./create-talent.dto";
 import { IsNumberString, IsOptional } from "class-validator";
 import { IsUserPhoneNumberAlreadyExist } from "@validation/user-phone-number-constraint";

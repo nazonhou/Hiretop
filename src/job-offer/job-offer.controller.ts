@@ -13,6 +13,9 @@ import { GetJobOfferStatisticsDto } from './get-job-offer-statistics.dto';
 export class JobOfferController {
   constructor(private jobOfferService: JobOfferService) {}
 
+  /**
+   * Create a job offer
+   */
   @Post()
   @Roles(Role.COMPANY)
   @LinkedCompany()
@@ -23,6 +26,9 @@ export class JobOfferController {
     return this.jobOfferService.createJobOffer(user, createJobOfferDto);
   }
 
+  /**
+   * Get a paged list of all job offers relevant to the current user
+   */
   @Get()
   searchJobOffers(
     @Query() searchJobOfferDto: SearchJobOfferDto,
@@ -31,6 +37,9 @@ export class JobOfferController {
     return this.jobOfferService.searchJobOffers(user, searchJobOfferDto);
   }
 
+  /**
+   * Get a statistics on all job offers created over a given period 
+   */
   @Get('statistics')
   @Roles(Role.COMPANY)
   @LinkedCompany()

@@ -7,6 +7,9 @@ import { Public } from '@auth/public.decorator';
 export class TalentController {
   constructor(private userService: UserService) {}
 
+  /**
+   * Self-registration as talent
+   */
   @Public()
   @Post()
   @HttpCode(HttpStatus.CREATED)

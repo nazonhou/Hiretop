@@ -1,4 +1,4 @@
-import { OmitType } from "@nestjs/mapped-types";
+import { OmitType } from "@nestjs/swagger";
 import { CreateTalentDto } from "./create-talent.dto";
 import { User } from '@prisma/client';
 

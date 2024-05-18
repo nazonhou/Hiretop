@@ -12,6 +12,9 @@ import { Role } from '@prisma/client';
 export class JobOfferApplicationController {
   constructor(private jobApplicationService: JobApplicationService) {}
 
+  /**
+   * Apply to a job offer
+   */
   @HttpCode(HttpStatus.CREATED)
   @Post()
   @UseGuards(JobOfferUnexpiredGuard)
@@ -22,6 +25,9 @@ export class JobOfferApplicationController {
     return this.jobApplicationService.apply(user, jobOfferId);
   }
 
+  /**
+   * Get a paged list of all job applications received for a job offer
+   */
   @HttpCode(HttpStatus.OK)
   @Get()
   @Roles(Role.COMPANY)
@@ -35,6 +41,9 @@ export class JobOfferApplicationController {
     );
   }
 
+  /**
+   * Get all the details about one job application
+   */
   @HttpCode(HttpStatus.OK)
   @Get(':jobApplicationId')
   @Roles(Role.COMPANY)
