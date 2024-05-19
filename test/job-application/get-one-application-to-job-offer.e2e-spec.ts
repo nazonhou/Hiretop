@@ -464,16 +464,19 @@ describe('[GET] /job-offers/:jobOfferId/job-applications/:jobApplicationId (e2e)
       expect(mockedAuthGuard.canActivate).toHaveBeenCalledTimes(1);
       expect(mockedJobApplicationRepository.findOneJobApplication).toHaveBeenCalledTimes(1);
       expect(mockedJobApplicationRepository.findOneJobApplication.mock.calls[0][0]).toBe(jobApplicationId);
+      expect(result.body.applicant.password).toBeUndefined();
+      expect(result.body.applicant.workExperiences).toMatchObject([
+        {
+          ...jobApplication.applicant.workExperiences[0],
+          endedAt: jobApplication.applicant.workExperiences[0].endedAt.toISOString(),
+          startedAt: jobApplication.applicant.workExperiences[0].startedAt.toISOString(),
+        }
+      ]);
+      expect(result.body.applicant.skills).toMatchObject(jobApplication.applicant.skills);
+      const { password, skills, workExperiences, ...applicantWithoutPassword } = jobApplication.applicant;
       expect(result.body['applicant']).toMatchObject({
-        ...jobApplication.applicant,
-        birthday: jobApplication.applicant.birthday.toISOString(),
-        workExperiences: [
-          {
-            ...jobApplication.applicant.workExperiences[0],
-            endedAt: jobApplication.applicant.workExperiences[0].endedAt.toISOString(),
-            startedAt: jobApplication.applicant.workExperiences[0].startedAt.toISOString(),
-          }
-        ]
+        ...applicantWithoutPassword,
+        birthday: applicantWithoutPassword.birthday.toISOString()
       });
       expect(result.body['appliedAt']).toBe(jobApplication.appliedAt.toISOString());
       expect(result.body['jobOffer']).toMatchObject({

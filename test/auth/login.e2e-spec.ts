@@ -210,12 +210,12 @@ describe('[POST] /auth/login (e2e)', () => {
       expect(findOneByEmailMock).toHaveBeenCalledTimes(1);
     });
 
-    it('should return 200 when password match', async () => {
+    it('should return 201 when password match', async () => {
       const result = await request(app.getHttpServer())
         .post('/auth/login')
         .send({ email: user.email, password: 'password' });
 
-      expect(result.status).toEqual(HttpStatus.OK);
+      expect(result.status).toEqual(HttpStatus.CREATED);
       expect(findOneByEmailMock).toHaveBeenCalledTimes(1);
       expect(findOneByEmailMock.mock.calls[0][0]).toBe(user.email);
       expect(userRepositoryMock.findOneById).toHaveBeenCalledTimes(1);

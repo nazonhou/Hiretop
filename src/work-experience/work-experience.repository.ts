@@ -6,10 +6,20 @@ import { CreateWorkExperienceDto } from "./create-work-experience.dto";
 export class WorkExperienceRepository {
   constructor(private prismaService: PrismaService) {}
 
-  createWorkExperience(userId: string, createWorkExperienceDto: CreateWorkExperienceDto) {
+  createWorkExperience(
+    userId: string,
+    createWorkExperienceDto: CreateWorkExperienceDto
+  ) {
     return this.prismaService.workExperience.create({
       data: {
-        ...createWorkExperienceDto,
+        companyId: createWorkExperienceDto.companyId,
+        startedAt: createWorkExperienceDto.startedAt,
+        title: createWorkExperienceDto.title,
+        description: createWorkExperienceDto.description,
+        endedAt: createWorkExperienceDto.endedAt,
+        location: createWorkExperienceDto.location,
+        locationType: createWorkExperienceDto.locationType,
+        type: createWorkExperienceDto.type,
         userId
       }
     });

@@ -1,8 +1,9 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { JobType, LocationType } from "@prisma/client"
 import { IsCompanyId } from "@validation/company-id-constraint";
 import { IsYounger } from "@validation/younger-date-constraint";
 import { Type } from "class-transformer";
-import { IsDate, IsDateString, IsEnum, IsNotEmpty, IsOptional, MaxDate } from "class-validator";
+import { IsDate, IsEnum, IsNotEmpty, IsOptional, MaxDate } from "class-validator";
 
 export class CreateWorkExperienceDto {
   @IsNotEmpty()
@@ -10,6 +11,7 @@ export class CreateWorkExperienceDto {
 
   @IsEnum(JobType)
   @IsOptional()
+  @ApiProperty({ enum: JobType })
   type?: JobType;
 
   @IsOptional()
@@ -17,6 +19,7 @@ export class CreateWorkExperienceDto {
 
   @IsEnum(LocationType)
   @IsOptional()
+  @ApiProperty({ enum: LocationType })
   locationType?: LocationType;
 
   @IsOptional()

@@ -10,7 +10,16 @@ export class UserRepository {
   constructor(private prismaService: PrismaService) {}
 
   create(createTalentDto: CreateTalentDto) {
-    return this.prismaService.user.create({ data: createTalentDto });
+    return this.prismaService.user.create({
+      data: {
+        email: createTalentDto.email,
+        address: createTalentDto.address,
+        birthday: createTalentDto.birthday,
+        name: createTalentDto.name,
+        password: createTalentDto.password,
+        phoneNumber: createTalentDto.phoneNumber,
+      }
+    });
   }
 
   async grantRoles(userId: string, roles: Role[]) {
@@ -55,7 +64,12 @@ export class UserRepository {
 
     return this.prismaService.user.create({
       data: {
-        ...userData,
+        email: userData.email,
+        address: userData.address,
+        birthday: userData.birthday,
+        name: userData.name,
+        password: userData.password,
+        phoneNumber: userData.phoneNumber,
         companyUser: {
           create: {
             company: {
@@ -80,7 +94,12 @@ export class UserRepository {
   updateUser(id: string, data: UpdateProfileDto) {
     return this.prismaService.user.update({
       where: { id },
-      data
+      data: {
+        address: data.address,
+        birthday: data.birthday,
+        name: data.name,
+        phoneNumber: data.phoneNumber
+      }
     });
   }
 

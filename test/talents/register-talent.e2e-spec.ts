@@ -196,6 +196,7 @@ describe('[POST] /talents (e2e)', () => {
         .send(createUserDto);
 
       expect(result.status).toEqual(HttpStatus.CREATED);
+      expect(result.body.password).toBeUndefined();
       expect(user).toMatchObject({ ...result.body, birthday: new Date(result.body["birthday"]) });
       expect(createMock).toHaveBeenCalledTimes(1);
       const [createTalentDto] = createMock.mock.calls[0];

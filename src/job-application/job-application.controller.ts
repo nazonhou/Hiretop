@@ -10,7 +10,10 @@ import { AcceptJobApplicationDto } from './accept-job-application.dto';
 import { PaginationDto } from '@src/pagination.dto';
 import { Authenticated } from '@user/authenticated.decorator';
 import { TokenPayload } from '@auth/auth.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('job-applications')
 @Controller('job-applications')
 export class JobApplicationController {
   constructor(private jobApplicationService: JobApplicationService) {}

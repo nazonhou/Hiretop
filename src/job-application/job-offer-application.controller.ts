@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JobOfferUnexpiredGuard } from '@job-offer/job-offer-unexpired.guard';
 import { JobApplicationService } from './job-application.service';
 import { Authenticated } from '@user/authenticated.decorator';
@@ -7,7 +7,10 @@ import { CompanyJobOfferGuard } from '@job-offer/company-job-offer.guard';
 import { PaginationDto } from '@src/pagination.dto';
 import { Roles } from '@auth/roles.decorator';
 import { Role } from '@prisma/client';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('job-applications')
 @Controller('job-offers/:jobOfferId/job-applications')
 export class JobOfferApplicationController {
   constructor(private jobApplicationService: JobApplicationService) {}

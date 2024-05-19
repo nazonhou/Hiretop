@@ -7,9 +7,11 @@ import { PaginationDto } from "@src/pagination.dto";
 export class CompanyRepository {
   constructor(private prismaService: PrismaService) {}
 
-  create(createCompanyDto: CreateCompanyDto) {
+  create({ name, values, category, culture, history, presentation }: CreateCompanyDto) {
     return this.prismaService.company.create({
-      data: createCompanyDto
+      data: {
+        name, values, category, culture, history, presentation
+      }
     });
   }
 

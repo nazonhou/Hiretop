@@ -11,3 +11,13 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     ports:
       - ${DATABASE_PORT:-5432}:5432
+
+  hiretop:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - '${API_PORT:-3000}:3000'
+    depends_on:
+      - postgres

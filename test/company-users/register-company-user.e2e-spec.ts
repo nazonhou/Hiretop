@@ -250,6 +250,7 @@ describe('[POST] /company-users (e2e)', () => {
         .send(dto);
 
       expect(result.status).toEqual(HttpStatus.CREATED);
+      expect(result.body.password).toBeUndefined();
       expect(user).toMatchObject({ ...result.body, birthday: new Date(result.body["birthday"]) });
       expect(createCompanyUserMock).toHaveBeenCalledTimes(1);
       const [createCompanyUserDto] = createCompanyUserMock.mock.calls[0];

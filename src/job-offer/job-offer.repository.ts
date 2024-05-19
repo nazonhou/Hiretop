@@ -6,6 +6,8 @@ import { JobOfferDto } from "./job-offer.dto";
 import { RawJobOfferDto } from "./raw-job-offer.dto";
 import { GetJobOfferStatisticsDto } from "./get-job-offer-statistics.dto";
 import { JobApplicationStatus } from "@prisma/client";
+import { SearchJobOffersResponseDto } from "./search-job-offers-response.dto";
+import { JobOffersStatisticsResponseDto } from "./job-offers-statistics-response.dto";
 
 @Injectable()
 export class JobOfferRepository {
@@ -15,7 +17,10 @@ export class JobOfferRepository {
     const { skillIds, ...dataToInsert } = createJobOfferDto;
     return this.prismaService.jobOffer.create({
       data: {
-        ...dataToInsert,
+        description: dataToInsert.description,
+        expiredAt: dataToInsert.expiredAt,
+        locationType: dataToInsert.locationType,
+        type: dataToInsert.type,
         postedAt: new Date(),
         author: { connect: { id: authorId } },
         company: { connect: { id: companyId } },
@@ -26,7 +31,7 @@ export class JobOfferRepository {
 
   async findJobOffersByUserId(
     userId: string, searchJobOfferDto: SearchJobOfferDto
-  ): Promise<{ total: number, data: Partial<JobOfferDto>[] }> {
+  ): Promise<SearchJobOffersResponseDto> {
     const { query: matchedSkillsQuery, values, countVariables: totalVariables } = this.getMatchedSkillsQuery(searchJobOfferDto);
     const jobOffersSkillsQuery = this.getJobOffersSkillsQuery();
 
@@ -159,6 +164,6 @@ export class JobOfferRepository {
     query += 'group by ';
     query += '  ja.status ';
 
-    return this.prismaService.$queryRawUnsafe<{ status: JobApplicationStatus, total: number }[]>(query, ...values);
+    return this.prismaService.$queryRawUnsafe<JobOffersStatisticsResponseDto[]>(query, ...values);
   }
 }

@@ -1,15 +1,19 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@prisma-module/prisma.service";
 import { CreateSkillDto } from "./create-skill.dto";
+import { PaginationDto } from "@src/pagination.dto";
 
 @Injectable()
 export class SkillRepository {
   constructor(private prismaService: PrismaService) {}
 
-  createSkill(authorId: string, data: CreateSkillDto) {
+  createSkill(
+    authorId: string,
+    { name }: CreateSkillDto
+  ) {
     return this.prismaService.skill.create({
       data: {
-        ...data,
+        name,
         author: {
           connect: {
             id: authorId
@@ -41,5 +45,14 @@ export class SkillRepository {
     return this.prismaService.skill.findMany({
       where: { users: { some: { id: userId } } }
     })
+  }
+
+  findByNameStartsWith(startsWith: string, { page, perPage }: PaginationDto) {
+    return this.prismaService.skill.findMany({
+      where: { name: { startsWith } },
+      orderBy: { name: "asc" },
+      skip: (page - 1) * perPage,
+      take: perPage
+    });
   }
 }

@@ -1,4 +1,5 @@
-import { CompanyCategory } from "@prisma/client";
+import { ApiProperty } from "@nestjs/swagger";
+import { $Enums, CompanyCategory } from "@prisma/client";
 import { IsCompanyNameAlreadyExist } from "@validation/company-name-constraint";
 import { IsUserEmailAlreadyExist } from "@validation/user-email-constraint";
 import { IsUserPhoneNumberAlreadyExist } from "@validation/user-phone-number-constraint";
@@ -46,6 +47,7 @@ export class CreateCompanyUserDto {
   @ArrayUnique()
   values: string[]
 
+  @ApiProperty({ enum: $Enums.CompanyCategory })
   @IsEnum(CompanyCategory)
   @IsOptional()
   category?: CompanyCategory

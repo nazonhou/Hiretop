@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { JobApplicationStatus } from "@prisma/client";
 
 export class RawJobApplicationDto {
@@ -9,6 +10,7 @@ export class RawJobApplicationDto {
 	birthday: Date;
 	phone_number: string;
 	appliedAt: Date;
+	@ApiProperty({ enum: JobApplicationStatus })
 	jobApplicationStatus: JobApplicationStatus;
 	jobOfferId: string;
 	totalSkills: number;

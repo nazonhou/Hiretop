@@ -1,4 +1,5 @@
-import { CompanyCategory } from "@prisma/client";
+import { ApiProperty } from "@nestjs/swagger";
+import { $Enums, CompanyCategory } from "@prisma/client";
 import { IsCompanyNameAlreadyExist } from "@validation/company-name-constraint";
 import { IsNotEmpty } from "class-validator";
 
@@ -15,5 +16,6 @@ export class CreateCompanyDto {
 
   values: string[];
 
+  @ApiProperty({ enum: $Enums.CompanyCategory })
   category?: CompanyCategory;
 }

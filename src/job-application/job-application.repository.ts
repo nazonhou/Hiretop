@@ -7,24 +7,29 @@ import { JobApplicationDto } from './job-application.dto';
 import { RejectJobApplicationDto } from './reject-job-application.dto';
 import { JobApplicationStatus } from '@prisma/client';
 import { AcceptJobApplicationDto } from './accept-job-application.dto';
+import { JobApplicationEntity } from './job-application.entity';
+import { GetJobApplicationsResponseDto } from './get-job-applications.response.dto';
+import { GetOneJobApplicationResponseDto } from './get-one-job-application.response.dto';
+import { UserDto } from '@user/user.dto';
+import { RejectJobApplicationResponseDto } from './reject-job-application.response.dto';
+import { AcceptJobApplicationResponseDto } from './accept-job-application.response.dto';
 
 @Injectable()
 export class JobApplicationRepository {
   constructor(private prismaService: PrismaService) {}
 
-  createJobApplication(createJobApplicationDto: CreateJobApplicationDto) {
+  createJobApplication(
+    { applicantId, jobOfferId }: CreateJobApplicationDto
+  ): Promise<JobApplicationEntity> {
     return this.prismaService.jobApplication.create({
-      data: createJobApplicationDto
+      data: { applicantId, jobOfferId }
     });
   }
 
   async findApplicationsByJobOfferId(
     jobOfferId: string,
     paginationDto: PaginationDto
-  ): Promise<{
-    total: number;
-    data: Partial<JobApplicationDto>[];
-  }> {
+  ): Promise<GetJobApplicationsResponseDto> {
     let query = '';
     query += 'with "_ApplicantMatchedSkills" as ( ';
     query += 'select ';
@@ -103,7 +108,7 @@ export class JobApplicationRepository {
     }
   }
 
-  findOneJobApplication(jobApplicationId: string) {
+  async findOneJobApplication(jobApplicationId: string) {
     return this.prismaService.jobApplication.findUnique({
       where: { id: jobApplicationId },
       include: {
@@ -125,7 +130,7 @@ export class JobApplicationRepository {
   rejectJobApplication(
     jobApplicationId: string,
     rejectJobApplicationDto: RejectJobApplicationDto
-  ) {
+  ): Promise<RejectJobApplicationResponseDto> {
     return this.prismaService.jobApplication.update({
       where: { id: jobApplicationId },
       data: {
@@ -143,7 +148,7 @@ export class JobApplicationRepository {
   acceptJobApplication(
     jobApplicationId: string,
     acceptJobApplicationDto: AcceptJobApplicationDto
-  ) {
+  ): Promise<AcceptJobApplicationResponseDto> {
     return this.prismaService.jobApplication.update({
       where: { id: jobApplicationId },
       data: {

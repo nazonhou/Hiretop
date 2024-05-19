@@ -6,6 +6,8 @@ import { PaginationDto } from '@src/pagination.dto';
 import { FindOneJobApplicationDto } from './find-one-job-application.dto';
 import { RejectJobApplicationDto } from './reject-job-application.dto';
 import { AcceptJobApplicationDto } from './accept-job-application.dto';
+import { GetOneJobApplicationResponseDto } from './get-one-job-application.response.dto';
+import { GetApplicationsForApplicantResponseDto } from './get-applications-for-applicant.response.dto';
 
 @Injectable()
 export class JobApplicationService {
@@ -27,7 +29,9 @@ export class JobApplicationService {
     );
   }
 
-  async findOneJobApplication({ jobApplicationId, jobOfferId, user }: FindOneJobApplicationDto) {
+  async findOneJobApplication(
+    { jobApplicationId, jobOfferId, user }: FindOneJobApplicationDto
+  ): Promise<GetOneJobApplicationResponseDto> {
     try {
       const jobApplication = await this.jobApplicationRepository.findOneJobApplication(
         jobApplicationId
@@ -35,7 +39,9 @@ export class JobApplicationService {
 
       if (jobApplication?.jobOfferId == jobOfferId
         && jobApplication?.jobOffer.companyId == user.company?.id) {
-        return jobApplication;
+        return GetOneJobApplicationResponseDto.fromJobApplicationWithJobOfferAndApplicant(
+          jobApplication
+        );
       }
 
       throw new ForbiddenException();
@@ -65,7 +71,7 @@ export class JobApplicationService {
 
   async findApplicationsByApplicantId(
     user: TokenPayload, paginationDto: PaginationDto
-  ) {
+  ): Promise<GetApplicationsForApplicantResponseDto> {
     const [data, total] = await this.jobApplicationRepository.findApplicationsByApplicantId(
       user.sub, paginationDto
     );

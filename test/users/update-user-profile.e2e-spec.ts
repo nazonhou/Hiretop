@@ -300,6 +300,7 @@ describe('[PUT] /users/profile (e2e)', () => {
         .send(data);
 
       expect(result.status).toEqual(HttpStatus.OK);
+      expect(result.body.password).toBeUndefined();
       expect(mockedAuthGuard.canActivate).toHaveBeenCalledTimes(1);
       expect(userRepository.findOneByPhoneNumber).toHaveBeenCalledTimes(1);
       expect(userRepository.findOneByPhoneNumber.mock.calls[0][0]).toBe(data.phoneNumber);

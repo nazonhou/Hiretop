@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
@@ -13,6 +11,7 @@ import { WorkExperienceModule } from './work-experience/work-experience.module';
 import { JobOfferModule } from './job-offer/job-offer.module';
 import { JobApplicationModule } from './job-application/job-application.module';
 import { JobInterviewModule } from './job-interview/job-interview.module';
+import { ApplicationFeedbackModule } from './application-feedback/application-feedback.module';
 import jwtConfig from '@config/jwt.config';
 import hashConfig from '@config/hash.config';
 
@@ -33,8 +32,9 @@ import hashConfig from '@config/hash.config';
     JobOfferModule,
     JobApplicationModule,
     JobInterviewModule,
+    ApplicationFeedbackModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

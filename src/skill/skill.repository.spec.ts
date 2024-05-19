@@ -170,4 +170,61 @@ describe('SkillRepository', () => {
       expect(result.length).toBe(0);
     });
   });
+
+  describe('findByNameStartsWith', () => {
+    it('Should find when match', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const [javascript, java] = await Promise.all([
+        prismaService.skill.create({
+          data: {
+            name: 'Javascript', author: { connect: { id: user.id } }
+          }
+        }),
+        prismaService.skill.create({
+          data: {
+            name: 'Java', author: { connect: { id: user.id } }
+          }
+        })
+      ]);
+      const result = await skillRepository.findByNameStartsWith('Java', { perPage: 2, page: 1 });
+      expect(result.length).toBe(2);
+      expect(result[0].id).toBe(java.id);
+      expect(result[1].id).toBe(javascript.id);
+    });
+    it('Should find paginated when match', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const [javascript, java] = await Promise.all([
+        prismaService.skill.create({
+          data: {
+            name: 'Javascript', author: { connect: { id: user.id } }
+          }
+        }),
+        prismaService.skill.create({
+          data: {
+            name: 'Java', author: { connect: { id: user.id } }
+          }
+        })
+      ]);
+      const result = await skillRepository.findByNameStartsWith('Java', { perPage: 1, page: 2 });
+      expect(result.length).toBe(1);
+      expect(result[0].id).toBe(javascript.id);
+    });
+    it('Should not find anything when not match', async () => {
+      const user = await prismaService.user.create({ data: createTestUserDto() });
+      const [javascript, java] = await Promise.all([
+        prismaService.skill.create({
+          data: {
+            name: 'Javascript', author: { connect: { id: user.id } }
+          }
+        }),
+        prismaService.skill.create({
+          data: {
+            name: 'Java', author: { connect: { id: user.id } }
+          }
+        })
+      ]);
+      const result = await skillRepository.findByNameStartsWith('Fake', { perPage: 2, page: 1 });
+      expect(result.length).toBe(0);
+    });
+  });
 });

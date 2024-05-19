@@ -1,4 +1,4 @@
-import { JobApplicationStatus, PrismaClient } from "@prisma/client";
+import { JobApplicationStatus, PrismaClient, Role } from "@prisma/client";
 import * as bcrypt from 'bcrypt';
 import { createTestAcceptJobApplicationDto, createTestCompanyDto, createTestJobOfferDto, createTestSkillDto, createTestUserDto, createTestWorkExperienceDto } from "./test-utils";
 import { faker } from "@faker-js/faker";
@@ -43,7 +43,8 @@ export class TestingStatisticSeed {
             ...createTestUserDto(),
             email: 'company.user@hiretop.io',
             password,
-            companyUser: { create: { companyId: company.id } }
+            companyUser: { create: { companyId: company.id } },
+            rolesUser: { create: [{ role: Role.COMPANY }] }
           }
         }),
       ]);

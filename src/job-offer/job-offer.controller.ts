@@ -8,7 +8,11 @@ import { Role } from '@prisma/client';
 import { LinkedCompany } from '@auth/linked-company.decorator';
 import { SearchJobOfferDto } from './search-job-offer.dto';
 import { GetJobOfferStatisticsDto } from './get-job-offer-statistics.dto';
+import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { JobOfferEntity } from './job-offer.entity';
 
+@ApiBearerAuth()
+@ApiTags('job-offers')
 @Controller('job-offers')
 export class JobOfferController {
   constructor(private jobOfferService: JobOfferService) {}
@@ -17,6 +21,7 @@ export class JobOfferController {
    * Create a job offer
    */
   @Post()
+  @ApiCreatedResponse({ type: JobOfferEntity })
   @Roles(Role.COMPANY)
   @LinkedCompany()
   registerJobOffer(
